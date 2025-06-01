@@ -48,7 +48,12 @@
         #text {
             font-size: 48px;
             display: none;
-            animation: flash 1s infinite;
+            opacity: 0; /* Start hidden */
+        }
+        
+        /* Flash animation (5 times) */
+        .flash {
+            animation: flash 1s 5 forwards;
         }
         
         @keyframes flash {
@@ -116,7 +121,14 @@
             setTimeout(() => {
                 emojiWrapper.style.display = 'none';
                 text.style.display = 'block';
-                text.classList.add('fade-in');
+                text.classList.add('flash');
+                
+                // After 5 flashes (5s), keep text solid
+                setTimeout(() => {
+                    text.style.animation = 'none';
+                    text.style.opacity = '1';
+                }, 5000); // 5 flashes * 1s each
+                
                 player.play();
             }, 300); // Matches the fade-out animation duration
         });
