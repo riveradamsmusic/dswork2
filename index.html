@@ -93,7 +93,7 @@
         }
         
         .track.playing {
-            color: #00ff00; /* Green color for currently playing track */
+            color: #00ff00;
         }
         
         /* Different fonts for each track */
@@ -106,9 +106,9 @@
         .track-6 { font-family: 'Rubik Doodle Shadow', cursive; top: 100px; left: 180px; }
         .track-7 { font-family: 'Comic Neue', cursive; top: 50px; left: 150px; }
         
-        /* Animation Styles */
+        /* Faster flash animation */
         .flash {
-            animation: flash 1s 5 forwards;
+            animation: flash 0.5s 5 forwards; /* Changed from 1s to 0.5s */
         }
         
         @keyframes flash {
@@ -187,35 +187,28 @@
                     try {
                         const trackIndex = trackElement.dataset.index;
                         
-                        // If clicking the currently playing track
                         if (currentPlayingTrack === trackIndex) {
                             if (currentAudio.paused) {
-                                // Resume playback
                                 await currentAudio.play();
                                 trackElement.classList.add('playing');
                             } else {
-                                // Pause playback
                                 currentAudio.pause();
                                 trackElement.classList.remove('playing');
                             }
                             return;
                         }
                         
-                        // Stop current audio if playing
                         if (currentAudio) {
                             currentAudio.pause();
                             document.querySelector('.track.playing')?.classList.remove('playing');
                         }
                         
-                        // Create new audio element
                         currentAudio = new Audio(track.file);
                         currentPlayingTrack = trackIndex;
                         
-                        // Play the new audio
                         await currentAudio.play();
                         trackElement.classList.add('playing');
                         
-                        // When audio ends
                         currentAudio.onended = () => {
                             trackElement.classList.remove('playing');
                             currentPlayingTrack = null;
@@ -230,13 +223,11 @@
         }
         
         emojiWrapper.addEventListener('click', async () => {
-            // Initialize audio context
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 await audioContext.resume();
             }
             
-            // Start animations
             emoji.classList.add('fade-out');
             
             setTimeout(() => {
@@ -248,7 +239,7 @@
                     text.style.display = 'none';
                     carousel.style.display = 'block';
                     initCarousel();
-                }, 5000);
+                }, 2500); // Matches 5 flashes at 0.5s each (5 × 0.5s = 2.5s)
             }, 300);
         });
     </script>
