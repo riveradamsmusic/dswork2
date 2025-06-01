@@ -13,7 +13,6 @@
             display: grid;
             place-items: center;
             margin: 0;
-            cursor: pointer;
         }
         .handwritten {
             font-family: 'Caveat', cursive;
@@ -25,17 +24,24 @@
         /* Emoji Container */
         .emoji-wrapper {
             display: inline-block;
-            font-size: 0; /* Reset font size for the wrapper */
+            font-size: 0;
+            cursor: pointer;
         }
         
         /* Actual Emoji */
         #emoji {
-            font-size: 80px; /* Base size */
+            font-size: 80px;
             display: inline-block;
-            width: 80px; /* Explicit dimensions */
+            width: 80px;
             height: 80px;
             line-height: 1;
             text-align: center;
+            transition: transform 0.2s ease;
+        }
+        
+        /* Pop animation when clicked */
+        #emoji:active {
+            transform: scale(0.8);
         }
         
         /* Text */
@@ -48,6 +54,24 @@
         @keyframes flash {
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
+        }
+        
+        /* Fade transition between emoji and text */
+        .fade-out {
+            animation: fadeOut 0.3s forwards;
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; transform: scale(1.2); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
         
         audio {
@@ -79,15 +103,22 @@
     </audio>
 
     <script>
-        const container = document.getElementById('container');
+        const emoji = document.getElementById('emoji');
         const emojiWrapper = document.querySelector('.emoji-wrapper');
         const text = document.getElementById('text');
         const player = document.getElementById('player');
 
-        container.addEventListener('click', () => {
-            emojiWrapper.style.display = 'none';
-            text.style.display = 'block';
-            player.play();
+        emojiWrapper.addEventListener('click', () => {
+            // Add pop effect
+            emoji.classList.add('fade-out');
+            
+            // After pop animation completes, show text
+            setTimeout(() => {
+                emojiWrapper.style.display = 'none';
+                text.style.display = 'block';
+                text.classList.add('fade-in');
+                player.play();
+            }, 300); // Matches the fade-out animation duration
         });
     </script>
 </body>
