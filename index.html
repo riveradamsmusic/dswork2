@@ -55,9 +55,10 @@
             font-size: 48px;
             display: none;
             opacity: 0;
+            position: absolute;
         }
         
-        /* Audio Carousel Styles */
+        /* Audio Carousel Styles - TEXT ONLY */
         .carousel-container {
             display: none;
             position: relative;
@@ -68,30 +69,24 @@
         
         .track {
             position: absolute;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.5s ease;
-            font-size: 12px;
+            transition: all 0.3s ease;
+            font-size: 14px;
             text-align: center;
-            word-break: break-word;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-        
-        .track.active {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-            z-index: 2;
+            /* Remove all background styles */
+            background: transparent !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            width: auto !important;
+            height: auto !important;
         }
         
         .track:hover {
-            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
         }
         
         /* Different fonts for each track */
@@ -122,15 +117,6 @@
             to { opacity: 0; transform: scale(1.2); }
         }
         
-        .fade-in {
-            animation: fadeIn 0.5s forwards;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
         /* Mobile scaling */
         @media only screen and (max-width: 600px) {
             #emoji {
@@ -141,14 +127,8 @@
             #text {
                 font-size: 64px;
             }
-            .carousel-container {
-                width: 250px;
-                height: 250px;
-            }
             .track {
-                width: 80px;
-                height: 80px;
-                font-size: 10px;
+                font-size: 16px;
             }
         }
     </style>
@@ -172,53 +152,47 @@
         
         let currentAudio = null;
         
-        // Manually list your MP3 files (GitHub Pages can't auto-detect)
+        // Audio files - UPDATE THESE TO MATCH YOUR ACTUAL FILES
         const audioFiles = [
-            { name: "Track 1", file: "21 Century copy.mp3" },
-            { name: "Track 2", file: "grey. copy.mp3" },
-            { name: "Track 3", file: "Mr. Solo copy.mp3" },
-			{ name: "Track 4", file: "Opportunities copy.mp3" },
-			{ name: "Track 5", file: "Rap (feat. AFEEGO) copy.mp3" },
-			{ name: "Track 6", file: "Spoken Word copy.mp3" },
-			{ name: "Track 7", file: "Trying copy.mp3" },
-			{ name: "Track 8", file: "Wynwood copy.Wav.mp3" },
-            // Add more as needed
+            { name: "21 Century", file: "21 Century copy.mp3" },
+            { name: "Grey", file: "grey. copy.mp3" },
+            { name: "Mr. Solo", file: "Mr. Solo copy.mp3" },
+            { name: "Opportunities", file: "Opportunities copy.mp3" },
+            { name: "Rap (feat. AFEEGO)", file: "Rap (feat. AFEEGO) copy.mp3" },
+            { name: "Spoken Word", file: "Spoken Word copy.mp3" },
+            { name: "Trying", file: "Trying copy.mp3" },
+            { name: "Wynwood", file: "Wynwood copy.Wav.mp3" }
         ];
         
-        // Initialize carousel with audio files
         function initCarousel() {
-            carousel.innerHTML = ''; // Clear any existing content
+            carousel.innerHTML = '';
             
             audioFiles.forEach((track, index) => {
                 const trackElement = document.createElement('div');
                 trackElement.className = `track track-${index % 8}`;
                 trackElement.textContent = track.name;
-                trackElement.dataset.index = index;
                 carousel.appendChild(trackElement);
                 
-                trackElement.addEventListener('click', () => playTrack(track.file, index));
+                // CLICK HANDLER WITH ERROR FALLBACK
+                trackElement.addEventListener('click', () => {
+                    try {
+                        if (currentAudio) {
+                            currentAudio.pause();
+                            currentAudio.currentTime = 0;
+                        }
+                        currentAudio = new Audio(track.file);
+                        currentAudio.play().catch(e => {
+                            console.error("Playback failed:", e);
+                            alert("Audio playback failed. Please check console.");
+                        });
+                    } catch (e) {
+                        console.error("Audio error:", e);
+                        alert("Couldn't load audio file: " + track.file);
+                    }
+                });
             });
         }
         
-        // Play selected track
-        function playTrack(filePath, index) {
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio.currentTime = 0;
-                document.querySelector('.track.active')?.classList.remove('active');
-            }
-            
-            currentAudio = new Audio(filePath);
-            currentAudio.play();
-            
-            document.querySelector(`.track[data-index="${index}"]`).classList.add('active');
-            
-            currentAudio.onended = () => {
-                document.querySelector(`.track[data-index="${index}"]`).classList.remove('active');
-            };
-        }
-        
-        // Handle initial click
         emojiWrapper.addEventListener('click', () => {
             emoji.classList.add('fade-out');
             
@@ -228,16 +202,12 @@
                 text.classList.add('flash');
                 
                 setTimeout(() => {
-                    text.style.animation = 'none';
-                    text.style.opacity = '1';
-                    
-                    // Show carousel after text appears
-                    setTimeout(() => {
-                        carousel.style.display = 'block';
-                        initCarousel();
-                    }, 500);
-                }, 5000); // 5 flashes (1s each)
-            }, 300); // Fade-out duration
+                    // COMPLETELY REMOVE TEXT AFTER FLASHES
+                    text.style.display = 'none'; 
+                    carousel.style.display = 'block';
+                    initCarousel();
+                }, 5000); // 5 flashes
+            }, 300);
         });
     </script>
 </body>
