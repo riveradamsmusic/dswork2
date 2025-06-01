@@ -160,7 +160,7 @@
         </div>
         <span id="text" class="handwritten">RiverAdam$</span>
         <div class="carousel-container" id="carousel">
-            <!-- Audio tracks will be added dynamically -->
+            <!-- Tracks will be added here -->
         </div>
     </div>
 
@@ -172,43 +172,26 @@
         
         let currentAudio = null;
         
-        // Function to get all WAV files from the RIVERADAMS folder
-        async function getAudioFiles() {
-            try {
-                // This assumes your GitHub Pages URL structure
-                const response = await fetch('RIVERADAMS/');
-                const text = await response.text();
-                const parser = new DOMParser();
-                const html = parser.parseFromString(text, 'text/html');
-                const links = html.querySelectorAll('a[href$=".wav"]');
-                
-                return Array.from(links).map(link => {
-                    const fileName = link.href.split('/').pop().replace('.wav', '');
-                    return {
-                        name: fileName,
-                        file: link.href
-                    };
-                });
-            } catch (error) {
-                console.error("Error loading audio files:", error);
-                return [];
-            }
-        }
+        // Manually list your MP3 files (GitHub Pages can't auto-detect)
+        const audioFiles = [
+            { name: "Track 1", file: "21 Century copy.mp3" },
+            { name: "Track 2", file: "grey. copy.mp3" },
+            { name: "Track 3", file: "Mr. Solo copy.mp3" },
+			{ name: "Track 4", file: "Opportunities copy.mp3" },
+			{ name: "Track 5", file: "Rap (feat. AFEEGO) copy.mp3" },
+			{ name: "Track 6", file: "Spoken Word copy.mp3" },
+			{ name: "Track 7", file: "Trying copy.mp3" },
+			{ name: "Track 8", file: "Wynwood copy.Wav.mp3" },
+            // Add more as needed
+        ];
         
-        // Initialize carousel with found audio files
-        async function initCarousel() {
-            const audioFiles = await getAudioFiles();
-            
-            if (audioFiles.length === 0) {
-                console.warn("No WAV files found in RIVERADAMS folder");
-                return;
-            }
-            
+        // Initialize carousel with audio files
+        function initCarousel() {
             carousel.innerHTML = ''; // Clear any existing content
             
             audioFiles.forEach((track, index) => {
                 const trackElement = document.createElement('div');
-                trackElement.className = `track track-${index % 8}`; // Cycle through 8 font styles
+                trackElement.className = `track track-${index % 8}`;
                 trackElement.textContent = track.name;
                 trackElement.dataset.index = index;
                 carousel.appendChild(trackElement);
@@ -219,28 +202,24 @@
         
         // Play selected track
         function playTrack(filePath, index) {
-            // Stop current audio if playing
             if (currentAudio) {
                 currentAudio.pause();
                 currentAudio.currentTime = 0;
                 document.querySelector('.track.active')?.classList.remove('active');
             }
             
-            // Play new track
             currentAudio = new Audio(filePath);
             currentAudio.play();
             
-            // Highlight active track
             document.querySelector(`.track[data-index="${index}"]`).classList.add('active');
             
-            // When track ends, remove active class
             currentAudio.onended = () => {
                 document.querySelector(`.track[data-index="${index}"]`).classList.remove('active');
             };
         }
         
         // Handle initial click
-        emojiWrapper.addEventListener('click', async () => {
+        emojiWrapper.addEventListener('click', () => {
             emoji.classList.add('fade-out');
             
             setTimeout(() => {
@@ -253,12 +232,12 @@
                     text.style.opacity = '1';
                     
                     // Show carousel after text appears
-                    setTimeout(async () => {
+                    setTimeout(() => {
                         carousel.style.display = 'block';
-                        await initCarousel();
+                        initCarousel();
                     }, 500);
-                }, 5000);
-            }, 300);
+                }, 5000); // 5 flashes (1s each)
+            }, 300); // Fade-out duration
         });
     </script>
 </body>
