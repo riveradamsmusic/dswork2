@@ -92,6 +92,10 @@
             transform: scale(1.1);
         }
         
+        .track.playing {
+            color: #00ff00; /* Green color for currently playing track */
+        }
+        
         /* Different fonts for each track */
         .track-0 { font-family: 'Press Start 2P', cursive; top: 20px; left: 100px; }
         .track-1 { font-family: 'Rubik Doodle Shadow', cursive; top: 50px; left: 50px; }
@@ -154,9 +158,10 @@
         const carousel = document.getElementById('carousel');
         
         let currentAudio = null;
+        let currentPlayingTrack = null;
         let audioContext = null;
 
-        // Audio files in RIVERADAMS folder - UPDATE FILENAMES TO MATCH EXACTLY
+        // Audio files in RIVERADAMS folder
         const audioFiles = [
             { name: "21 Century", file: "RIVERADAMS/21_Century_copy.mp3" },
             { name: "Grey", file: "RIVERADAMS/grey_copy.mp3" },
@@ -175,28 +180,46 @@
                 const trackElement = document.createElement('div');
                 trackElement.className = `track track-${index % 8}`;
                 trackElement.textContent = track.name;
+                trackElement.dataset.index = index;
                 carousel.appendChild(trackElement);
                 
                 trackElement.addEventListener('click', async () => {
                     try {
+                        const trackIndex = trackElement.dataset.index;
+                        
+                        // If clicking the currently playing track
+                        if (currentPlayingTrack === trackIndex) {
+                            if (currentAudio.paused) {
+                                // Resume playback
+                                await currentAudio.play();
+                                trackElement.classList.add('playing');
+                            } else {
+                                // Pause playback
+                                currentAudio.pause();
+                                trackElement.classList.remove('playing');
+                            }
+                            return;
+                        }
+                        
                         // Stop current audio if playing
                         if (currentAudio) {
                             currentAudio.pause();
-                            currentAudio.currentTime = 0;
+                            document.querySelector('.track.playing')?.classList.remove('playing');
                         }
                         
-                        // Create new audio element with error handling
-                        const audio = new Audio();
-                        audio.src = track.file;
+                        // Create new audio element
+                        currentAudio = new Audio(track.file);
+                        currentPlayingTrack = trackIndex;
                         
-                        // Add error listener for debugging
-                        audio.addEventListener('error', (e) => {
-                            console.error('Audio load error:', e);
-                            alert(`File not found: ${track.file}\nPlease check:\n1. Folder exists\n2. Filename matches exactly\n3. File extension is .mp3`);
-                        });
+                        // Play the new audio
+                        await currentAudio.play();
+                        trackElement.classList.add('playing');
                         
-                        currentAudio = audio;
-                        await audio.play();
+                        // When audio ends
+                        currentAudio.onended = () => {
+                            trackElement.classList.remove('playing');
+                            currentPlayingTrack = null;
+                        };
                         
                     } catch (e) {
                         console.error("Playback failed:", e);
