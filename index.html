@@ -27,12 +27,14 @@
             letter-spacing: 1px;
         }
         
-        /* Initial Emoji Styles */
+        /* Centered Emoji Styles */
         .emoji-wrapper {
-            display: inline-block;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-size: 0;
             cursor: pointer;
-            position: relative;
             z-index: 10;
         }
         
@@ -50,21 +52,27 @@
             transform: scale(0.8);
         }
         
-        /* Text Styles */
+        /* Centered Text Styles */
         #text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-size: 48px;
             display: none;
             opacity: 0;
-            position: absolute;
+            z-index: 5;
         }
         
-        /* Audio Carousel Styles - TEXT ONLY */
+        /* Audio Carousel Styles */
         .carousel-container {
             display: none;
-            position: relative;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 300px;
             height: 300px;
-            margin: 0 auto;
         }
         
         .track {
@@ -77,12 +85,7 @@
             transition: all 0.3s ease;
             font-size: 14px;
             text-align: center;
-            /* Remove all background styles */
-            background: transparent !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-            width: auto !important;
-            height: auto !important;
+            background: transparent;
         }
         
         .track:hover {
@@ -152,16 +155,16 @@
         
         let currentAudio = null;
         
-        // Audio files - UPDATE THESE TO MATCH YOUR ACTUAL FILES
+        // Audio files configuration - UPDATE THESE PATHS
         const audioFiles = [
-            { name: "21 Century", file: "21 Century copy.mp3" },
-            { name: "Grey", file: "grey. copy.mp3" },
-            { name: "Mr. Solo", file: "Mr. Solo copy.mp3" },
-            { name: "Opportunities", file: "Opportunities copy.mp3" },
-            { name: "Rap (feat. AFEEGO)", file: "Rap (feat. AFEEGO) copy.mp3" },
-            { name: "Spoken Word", file: "Spoken Word copy.mp3" },
-            { name: "Trying", file: "Trying copy.mp3" },
-            { name: "Wynwood", file: "Wynwood copy.Wav.mp3" }
+            { name: "21 Century", file: "./21 Century copy.mp3" },
+            { name: "Grey", file: "./grey. copy.mp3" },
+            { name: "Mr. Solo", file: "./Mr. Solo copy.mp3" },
+            { name: "Opportunities", file: "./Opportunities copy.mp3" },
+            { name: "Rap (feat. AFEEGO)", file: "./Rap (feat. AFEEGO) copy.mp3" },
+            { name: "Spoken Word", file: "./Spoken Word copy.mp3" },
+            { name: "Trying", file: "./Trying copy.mp3" },
+            { name: "Wynwood", file: "./Wynwood copy.Wav.mp3" }
         ];
         
         function initCarousel() {
@@ -173,21 +176,26 @@
                 trackElement.textContent = track.name;
                 carousel.appendChild(trackElement);
                 
-                // CLICK HANDLER WITH ERROR FALLBACK
-                trackElement.addEventListener('click', () => {
+                trackElement.addEventListener('click', async () => {
                     try {
+                        // Stop current audio if playing
                         if (currentAudio) {
                             currentAudio.pause();
                             currentAudio.currentTime = 0;
                         }
+                        
+                        // Create new audio element
                         currentAudio = new Audio(track.file);
-                        currentAudio.play().catch(e => {
+                        
+                        // Modern browsers require play() to be triggered by user gesture
+                        await currentAudio.play().catch(e => {
                             console.error("Playback failed:", e);
-                            alert("Audio playback failed. Please check console.");
+                            alert("Please interact with the page first (click anywhere) to enable audio");
                         });
+                        
                     } catch (e) {
                         console.error("Audio error:", e);
-                        alert("Couldn't load audio file: " + track.file);
+                        alert(`Error loading: ${track.file}\nCheck console for details`);
                     }
                 });
             });
@@ -202,13 +210,17 @@
                 text.classList.add('flash');
                 
                 setTimeout(() => {
-                    // COMPLETELY REMOVE TEXT AFTER FLASHES
-                    text.style.display = 'none'; 
+                    text.style.display = 'none';
                     carousel.style.display = 'block';
                     initCarousel();
-                }, 5000); // 5 flashes
+                }, 5000);
             }, 300);
         });
+        
+        // Enable audio on first user interaction (required by some browsers)
+        document.body.addEventListener('click', () => {
+            // This empty handler helps unlock audio on mobile devices
+        }, { once: true });
     </script>
 </body>
 </html>
