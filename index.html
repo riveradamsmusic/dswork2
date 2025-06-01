@@ -154,8 +154,9 @@
         const carousel = document.getElementById('carousel');
         
         let currentAudio = null;
-        
-        // Audio files configuration - UPDATE THESE PATHS
+        let audioContext = null;
+
+        // Audio files configuration - UPDATE THESE TO MATCH YOUR FILES
         const audioFiles = [
             { name: "21 Century", file: "./21 Century copy.mp3" },
             { name: "Grey", file: "./grey. copy.mp3" },
@@ -166,7 +167,7 @@
             { name: "Trying", file: "./Trying copy.mp3" },
             { name: "Wynwood", file: "./Wynwood copy.Wav.mp3" }
         ];
-        
+
         function initCarousel() {
             carousel.innerHTML = '';
             
@@ -178,30 +179,30 @@
                 
                 trackElement.addEventListener('click', async () => {
                     try {
-                        // Stop current audio if playing
                         if (currentAudio) {
                             currentAudio.pause();
                             currentAudio.currentTime = 0;
                         }
                         
-                        // Create new audio element
                         currentAudio = new Audio(track.file);
-                        
-                        // Modern browsers require play() to be triggered by user gesture
-                        await currentAudio.play().catch(e => {
-                            console.error("Playback failed:", e);
-                            alert("Please interact with the page first (click anywhere) to enable audio");
-                        });
+                        await currentAudio.play();
                         
                     } catch (e) {
                         console.error("Audio error:", e);
-                        alert(`Error loading: ${track.file}\nCheck console for details`);
+                        alert(`Error playing: ${track.name}\n${e.message}`);
                     }
                 });
             });
         }
         
-        emojiWrapper.addEventListener('click', () => {
+        emojiWrapper.addEventListener('click', async () => {
+            // Initialize audio on first click
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                await audioContext.resume().catch(e => console.log("Audio ready"));
+            }
+            
+            // Start animations
             emoji.classList.add('fade-out');
             
             setTimeout(() => {
@@ -216,11 +217,6 @@
                 }, 5000);
             }, 300);
         });
-        
-        // Enable audio on first user interaction (required by some browsers)
-        document.body.addEventListener('click', () => {
-            // This empty handler helps unlock audio on mobile devices
-        }, { once: true });
     </script>
 </body>
 </html>
