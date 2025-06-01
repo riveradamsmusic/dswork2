@@ -21,40 +21,57 @@
             user-select: none;
             letter-spacing: 1px;
         }
-        /* Default size (desktop) */
-        #emoji, #text {
-            font-size: 48px; /* Increased from 32px to match sizes */
+        
+        /* Emoji Container */
+        .emoji-wrapper {
+            display: inline-block;
+            font-size: 0; /* Reset font size for the wrapper */
         }
+        
+        /* Actual Emoji */
         #emoji {
-            display: block;
-            font-size: 64px; /* Even larger cassette emoji */
+            font-size: 80px; /* Base size */
+            display: inline-block;
+            width: 80px; /* Explicit dimensions */
+            height: 80px;
+            line-height: 1;
+            text-align: center;
         }
+        
+        /* Text */
         #text {
+            font-size: 48px;
             display: none;
             animation: flash 1s infinite;
         }
+        
         @keyframes flash {
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
+        
         audio {
             display: none;
         }
 
         /* Mobile scaling */
         @media only screen and (max-width: 600px) {
-            #emoji, #text {
-                font-size: 64px !important; /* Larger on mobile */
-            }
             #emoji {
-                font-size: 72px !important; /* Extra large cassette on mobile */
+                font-size: 100px;
+                width: 100px;
+                height: 100px;
+            }
+            #text {
+                font-size: 64px;
             }
         }
     </style>
 </head>
 <body>
     <div id="container">
-        <span id="emoji" class="handwritten">📼</span>
+        <div class="emoji-wrapper">
+            <span id="emoji" class="handwritten">📼</span>
+        </div>
         <span id="text" class="handwritten">RiverAdam$</span>
     </div>
     <audio id="player" loop>
@@ -63,12 +80,12 @@
 
     <script>
         const container = document.getElementById('container');
-        const emoji = document.getElementById('emoji');
+        const emojiWrapper = document.querySelector('.emoji-wrapper');
         const text = document.getElementById('text');
         const player = document.getElementById('player');
 
         container.addEventListener('click', () => {
-            emoji.style.display = 'none';
+            emojiWrapper.style.display = 'none';
             text.style.display = 'block';
             player.play();
         });
