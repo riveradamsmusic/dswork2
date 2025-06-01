@@ -108,7 +108,7 @@
         
         /* Faster flash animation */
         .flash {
-            animation: flash 0.5s 5 forwards; /* Changed from 1s to 0.5s */
+            animation: flash 0.5s 5 forwards;
         }
         
         @keyframes flash {
@@ -187,6 +187,7 @@
                     try {
                         const trackIndex = trackElement.dataset.index;
                         
+                        // If clicking the currently playing track
                         if (currentPlayingTrack === trackIndex) {
                             if (currentAudio.paused) {
                                 await currentAudio.play();
@@ -198,25 +199,36 @@
                             return;
                         }
                         
+                        // If switching to a different track
                         if (currentAudio) {
                             currentAudio.pause();
                             document.querySelector('.track.playing')?.classList.remove('playing');
+                            currentAudio = null;
                         }
                         
+                        // Load and play new track
                         currentAudio = new Audio(track.file);
                         currentPlayingTrack = trackIndex;
+                        
+                        // Set up error handling
+                        currentAudio.addEventListener('error', (e) => {
+                            console.error('Audio error:', e);
+                            trackElement.classList.remove('playing');
+                            currentPlayingTrack = null;
+                        });
                         
                         await currentAudio.play();
                         trackElement.classList.add('playing');
                         
+                        // Handle track ending
                         currentAudio.onended = () => {
                             trackElement.classList.remove('playing');
                             currentPlayingTrack = null;
                         };
                         
                     } catch (e) {
-                        console.error("Playback failed:", e);
-                        alert(`Error playing: ${track.name}\n${e.message}`);
+                        console.error("Playback error:", e);
+                        // No alert - fails silently to prevent interruption
                     }
                 });
             });
@@ -239,7 +251,7 @@
                     text.style.display = 'none';
                     carousel.style.display = 'block';
                     initCarousel();
-                }, 2500); // Matches 5 flashes at 0.5s each (5 × 0.5s = 2.5s)
+                }, 2500);
             }, 300);
         });
     </script>
