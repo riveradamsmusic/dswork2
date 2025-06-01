@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile viewport fix -->
     <title>RiverAdam$</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
@@ -16,12 +17,19 @@
         }
         .handwritten {
             font-family: 'Caveat', cursive;
-            font-size: 32px;
             color: white;
             user-select: none;
             letter-spacing: 1px;
         }
-        .flash-mode {
+        /* Default size (desktop) */
+        #emoji, #text {
+            font-size: 32px;
+        }
+        #emoji {
+            display: block;
+        }
+        #text {
+            display: none;
             animation: flash 1s infinite;
         }
         @keyframes flash {
@@ -31,24 +39,32 @@
         audio {
             display: none;
         }
+
+        /* Mobile scaling (phones) */
+        @media only screen and (max-width: 600px) {
+            #emoji, #text {
+                font-size: 48px !important; /* Larger on mobile */
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="text-container" class="handwritten">📼</div>
+    <div id="container">
+        <span id="emoji" class="handwritten">📼</span>
+        <span id="text" class="handwritten">RiverAdam$</span>
+    </div>
     <audio id="player" loop>
         <source src="audio.wav" type="audio/wav">
     </audio>
 
     <script>
-        const container = document.getElementById('text-container');
+        const emoji = document.getElementById('emoji');
+        const text = document.getElementById('text');
         const player = document.getElementById('player');
 
         container.addEventListener('click', () => {
-            // Switch to flashing text (no emoji)
-            container.textContent = 'RiverAdam$';
-            container.classList.add('flash-mode');
-            
-            // Play audio
+            emoji.style.display = 'none';
+            text.style.display = 'block';
             player.play();
         });
     </script>
