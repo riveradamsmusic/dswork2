@@ -20,12 +20,13 @@
             color: white;
             user-select: none;
             letter-spacing: 1px;
-            opacity: 1; /* Start visible */
-            animation: flash 1s infinite; /* Flash effect */
+        }
+        .flash-mode {
+            animation: flash 1s infinite;
         }
         @keyframes flash {
-            0%, 100% { opacity: 1; } /* Visible */
-            50% { opacity: 0; }      /* Invisible */
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
         audio {
             display: none;
@@ -33,11 +34,23 @@
     </style>
 </head>
 <body>
-    <div class="handwritten" onclick="document.getElementById('player').play()">
-        RiverAdam$ 📼  <!-- Cassette emoji added -->
-    </div>
+    <div id="text-container" class="handwritten">📼</div>
     <audio id="player" loop>
         <source src="audio.wav" type="audio/wav">
     </audio>
+
+    <script>
+        const container = document.getElementById('text-container');
+        const player = document.getElementById('player');
+
+        container.addEventListener('click', () => {
+            // Switch to flashing text (no emoji)
+            container.textContent = 'RiverAdam$';
+            container.classList.add('flash-mode');
+            
+            // Play audio
+            player.play();
+        });
+    </script>
 </body>
 </html>
