@@ -156,16 +156,16 @@
         let currentAudio = null;
         let audioContext = null;
 
-        // Audio files configuration - UPDATE THESE TO MATCH YOUR FILES
+        // Audio files in RIVERADAMS folder - UPDATE FILENAMES TO MATCH EXACTLY
         const audioFiles = [
-            { name: "21 Century", file: "./21 Century copy.mp3" },
-            { name: "Grey", file: "./grey. copy.mp3" },
-            { name: "Mr. Solo", file: "./Mr. Solo copy.mp3" },
-            { name: "Opportunities", file: "./Opportunities copy.mp3" },
-            { name: "Rap (feat. AFEEGO)", file: "./Rap (feat. AFEEGO) copy.mp3" },
-            { name: "Spoken Word", file: "./Spoken Word copy.mp3" },
-            { name: "Trying", file: "./Trying copy.mp3" },
-            { name: "Wynwood", file: "./Wynwood copy.Wav.mp3" }
+            { name: "21 Century", file: "RIVERADAMS/21_Century_copy.mp3" },
+            { name: "Grey", file: "RIVERADAMS/grey_copy.mp3" },
+            { name: "Mr. Solo", file: "RIVERADAMS/Mr_Solo_copy.mp3" },
+            { name: "Opportunities", file: "RIVERADAMS/Opportunities_copy.mp3" },
+            { name: "Rap (feat. AFEEGO)", file: "RIVERADAMS/Rap_feat_AFEEGO_copy.mp3" },
+            { name: "Spoken Word", file: "RIVERADAMS/Spoken_Word_copy.mp3" },
+            { name: "Trying", file: "RIVERADAMS/Trying_copy.mp3" },
+            { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3" }
         ];
 
         function initCarousel() {
@@ -179,16 +179,27 @@
                 
                 trackElement.addEventListener('click', async () => {
                     try {
+                        // Stop current audio if playing
                         if (currentAudio) {
                             currentAudio.pause();
                             currentAudio.currentTime = 0;
                         }
                         
-                        currentAudio = new Audio(track.file);
-                        await currentAudio.play();
+                        // Create new audio element with error handling
+                        const audio = new Audio();
+                        audio.src = track.file;
+                        
+                        // Add error listener for debugging
+                        audio.addEventListener('error', (e) => {
+                            console.error('Audio load error:', e);
+                            alert(`File not found: ${track.file}\nPlease check:\n1. Folder exists\n2. Filename matches exactly\n3. File extension is .mp3`);
+                        });
+                        
+                        currentAudio = audio;
+                        await audio.play();
                         
                     } catch (e) {
-                        console.error("Audio error:", e);
+                        console.error("Playback failed:", e);
                         alert(`Error playing: ${track.name}\n${e.message}`);
                     }
                 });
@@ -196,10 +207,10 @@
         }
         
         emojiWrapper.addEventListener('click', async () => {
-            // Initialize audio on first click
+            // Initialize audio context
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                await audioContext.resume().catch(e => console.log("Audio ready"));
+                await audioContext.resume();
             }
             
             // Start animations
