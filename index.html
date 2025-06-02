@@ -71,8 +71,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 400px; /* Expanded from 300px */
-            height: 400px; /* Expanded from 300px */
+            width: 400px;
+            height: 400px;
         }
         
         .track {
@@ -119,6 +119,7 @@
             overflow: hidden;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background-color: rgba(20, 20, 20, 0.5); /* Fallback background */
         }
         
         .slide {
@@ -128,6 +129,16 @@
             object-fit: cover;
             opacity: 0;
             transition: all 1s ease;
+        }
+        
+        .error-text {
+            position: absolute;
+            color: white;
+            font-family: 'Caveat', cursive;
+            text-align: center;
+            width: 100%;
+            top: 50%;
+            transform: translateY(-50%);
         }
         
         /* Random transition classes */
@@ -258,8 +269,7 @@
         </div>
         <span id="text" class="handwritten">RiverAdam$</span>
         <div class="carousel-container" id="carousel">
-            <!-- Slideshow container will be added here by JavaScript -->
-            <!-- Tracks will be added here -->
+            <!-- Slideshow and tracks will be added here by JavaScript -->
         </div>
         <div class="platform-links" id="platformLinks">
             <a href="https://music.apple.com/us/artist/river-adams/1554125278" class="platform-link" target="_blank">
@@ -302,11 +312,21 @@
             { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3" }
         ];
 
-        // Photo files in RIVERADAMSPICZ folder
-        const photoFiles = [];
-        for (let i = 1; i <= 12; i++) {
-            photoFiles.push(`RIVERADAMSPICZ/pic${i}.jpg`);
-        }
+        // Photo files in RIVERADAMSPICZ folder - adjust these names to match your actual files
+        const photoFiles = [
+            'RIVERADAMSPICZ/1.jpg',
+            'RIVERADAMSPICZ/2.jpg',
+            'RIVERADAMSPICZ/3.jpg',
+            'RIVERADAMSPICZ/4.jpg',
+            'RIVERADAMSPICZ/5.jpg',
+            'RIVERADAMSPICZ/6.jpg',
+            'RIVERADAMSPICZ/7.jpg',
+            'RIVERADAMSPICZ/8.jpg',
+            'RIVERADAMSPICZ/9.jpg',
+            'RIVERADAMSPICZ/10.jpg',
+            'RIVERADAMSPICZ/11.jpg',
+            'RIVERADAMSPICZ/12.jpg'
+        ];
 
         // Transition types
         const transitions = [
@@ -330,6 +350,20 @@
                 slide.className = 'slide';
                 slide.src = photo;
                 slide.alt = `RiverAdams photo ${index + 1}`;
+                
+                // Add error handling for each image
+                slide.onerror = function() {
+                    this.style.display = 'none';
+                    console.error('Failed to load image:', photo);
+                    // Create error message if this is the first slide
+                    if (index === 0 && !document.querySelector('.error-text')) {
+                        const errorMsg = document.createElement('div');
+                        errorMsg.className = 'error-text';
+                        errorMsg.textContent = 'Photos not found';
+                        slideshowContainer.appendChild(errorMsg);
+                    }
+                };
+                
                 slideshowContainer.appendChild(slide);
             });
 
@@ -341,31 +375,48 @@
             const slides = document.querySelectorAll('.slide');
             if (slides.length === 0) return;
 
-            // Show first slide
-            slides[0].classList.add('fade-in');
-            slides[0].style.opacity = '1';
+            // Show first slide that loads successfully
+            let firstVisibleSlide = 0;
+            while (firstVisibleSlide < slides.length && slides[firstVisibleSlide].naturalWidth === 0) {
+                firstVisibleSlide++;
+            }
+
+            if (firstVisibleSlide < slides.length) {
+                slides[firstVisibleSlide].classList.add('fade-in');
+                slides[firstVisibleSlide].style.opacity = '1';
+                currentSlide = firstVisibleSlide;
+            }
 
             // Set interval for slideshow
             slideInterval = setInterval(() => {
                 // Hide current slide
                 slides[currentSlide].className = 'slide';
                 
-                // Move to next slide
-                currentSlide = (currentSlide + 1) % slides.length;
+                // Move to next slide that exists
+                let nextSlide = (currentSlide + 1) % slides.length;
+                let attempts = 0;
+                while (attempts < slides.length && slides[nextSlide].naturalWidth === 0) {
+                    nextSlide = (nextSlide + 1) % slides.length;
+                    attempts++;
+                }
+                
+                if (attempts >= slides.length) return; // No valid slides found
                 
                 // Get random transition
                 const randomTransition = transitions[Math.floor(Math.random() * transitions.length)];
                 
                 // Apply transition
                 if (randomTransition.out) {
-                    slides[currentSlide].className = `slide ${randomTransition.out}`;
+                    slides[nextSlide].className = `slide ${randomTransition.out}`;
                 }
                 
                 // Force reflow
-                void slides[currentSlide].offsetWidth;
+                void slides[nextSlide].offsetWidth;
                 
                 // Apply transition in
-                slides[currentSlide].className = `slide ${randomTransition.in}`;
+                slides[nextSlide].className = `slide ${randomTransition.in}`;
+                
+                currentSlide = nextSlide;
                 
             }, 6000); // 6 seconds per slide
         }
