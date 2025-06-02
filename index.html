@@ -64,17 +64,15 @@
             z-index: 5;
         }
         
-        /* Audio Carousel Styles - Now using viewport units */
+        /* Audio Carousel Styles - Wider version */
         .carousel-container {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90vmin;
-            height: 90vmin;
-            max-width: 500px;
-            max-height: 500px;
+            width: 450px; /* Increased from 300px */
+            height: 450px; /* Increased from 300px */
         }
         
         .track {
@@ -89,8 +87,6 @@
             text-align: center;
             background: transparent;
             z-index: 2;
-            width: 120px;
-            margin-left: -60px;
         }
         
         .track:hover {
@@ -101,28 +97,24 @@
             color: #00ff00;
         }
         
-        /* Position tracks in a circle */
-        .track-0 { top: 5%; left: 50%; }
-        .track-1 { top: 15%; left: 20%; }
-        .track-2 { top: 30%; left: 5%; }
-        .track-3 { top: 50%; left: 5%; }
-        .track-4 { top: 70%; left: 20%; }
-        .track-5 { top: 80%; left: 50%; }
-        .track-6 { top: 70%; left: 80%; }
-        .track-7 { top: 50%; left: 95%; }
-        .track-8 { top: 30%; left: 95%; }
-        .track-9 { top: 15%; left: 80%; }
+        /* Original track positions with wider spacing */
+        .track-0 { font-family: 'Press Start 2P', cursive; top: 30px; left: 175px; }
+        .track-1 { font-family: 'Rubik Doodle Shadow', cursive; top: 80px; left: 90px; }
+        .track-2 { font-family: 'Comic Neue', cursive; top: 160px; left: 50px; }
+        .track-3 { font-family: 'Permanent Marker', cursive; top: 250px; left: 90px; }
+        .track-4 { font-family: 'Caveat', cursive; top: 300px; left: 175px; }
+        .track-5 { font-family: 'Press Start 2P', cursive; top: 250px; left: 260px; }
+        .track-6 { font-family: 'Rubik Doodle Shadow', cursive; top: 160px; left: 300px; }
+        .track-7 { font-family: 'Comic Neue', cursive; top: 80px; left: 260px; }
         
-        /* Photo Slideshow - Now responsive and smaller */
+        /* Photo Slideshow - Half size */
         .slideshow-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 60vmin;
-            height: 60vmin;
-            max-width: 300px;
-            max-height: 300px;
+            width: 180px; /* Half of previous size */
+            height: 180px; /* Half of previous size */
             z-index: 1;
             overflow: hidden;
             border-radius: 8px;
@@ -236,14 +228,25 @@
             #text {
                 font-size: 64px;
             }
+            .carousel-container {
+                width: 350px;
+                height: 350px;
+            }
             .track {
                 font-size: 12px;
-                width: 100px;
-                margin-left: -50px;
             }
+            /* Adjusted track positions for mobile */
+            .track-0 { top: 25px; left: 140px; }
+            .track-1 { top: 65px; left: 70px; }
+            .track-2 { top: 130px; left: 35px; }
+            .track-3 { top: 210px; left: 70px; }
+            .track-4 { top: 250px; left: 140px; }
+            .track-5 { top: 210px; left: 210px; }
+            .track-6 { top: 130px; left: 245px; }
+            .track-7 { top: 65px; left: 210px; }
             .slideshow-container {
-                width: 50vmin;
-                height: 50vmin;
+                width: 140px;
+                height: 140px;
             }
             .platform-links {
                 bottom: 25px;
@@ -308,7 +311,7 @@
             { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3" }
         ];
 
-        // Photo files - adjust these names to match your actual files
+        // Photo files in RIVERADAMSPICZ folder
         const photoFiles = [];
         for (let i = 1; i <= 12; i++) {
             photoFiles.push(`RIVERADAMSPICZ/${i}.jpg`);
@@ -382,27 +385,13 @@
             }, 6000); // 6 seconds per slide
         }
 
-        function positionTracks() {
-            const tracks = document.querySelectorAll('.track');
-            const radius = Math.min(carousel.offsetWidth, carousel.offsetHeight) * 0.4;
-            
-            tracks.forEach((track, index) => {
-                const angle = (index / tracks.length) * Math.PI * 2;
-                const x = Math.cos(angle) * radius;
-                const y = Math.sin(angle) * radius;
-                
-                track.style.left = `calc(50% + ${x}px)`;
-                track.style.top = `calc(50% + ${y}px)`;
-            });
-        }
-
         function initCarousel() {
             carousel.innerHTML = '';
             createSlideshow();
             
             audioFiles.forEach((track, index) => {
                 const trackElement = document.createElement('div');
-                trackElement.className = `track track-${index}`;
+                trackElement.className = `track track-${index % 8}`;
                 trackElement.textContent = track.name;
                 trackElement.dataset.index = index;
                 carousel.appendChild(trackElement);
@@ -450,9 +439,6 @@
                     }
                 });
             });
-
-            positionTracks();
-            window.addEventListener('resize', positionTracks);
         }
         
         emojiWrapper.addEventListener('click', async () => {
