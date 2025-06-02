@@ -64,15 +64,15 @@
             z-index: 5;
         }
         
-        /* Audio Carousel Styles - Wider version */
+        /* Audio Carousel Styles - Wider horizontal oval */
         .carousel-container {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 450px; /* Increased from 300px */
-            height: 450px; /* Increased from 300px */
+            width: 500px;  /* Wider container */
+            height: 400px; /* Slightly shorter */
         }
         
         .track {
@@ -87,6 +87,8 @@
             text-align: center;
             background: transparent;
             z-index: 2;
+            width: 120px;
+            margin-left: -60px;
         }
         
         .track:hover {
@@ -97,24 +99,24 @@
             color: #00ff00;
         }
         
-        /* Original track positions with wider spacing */
-        .track-0 { font-family: 'Press Start 2P', cursive; top: 30px; left: 175px; }
-        .track-1 { font-family: 'Rubik Doodle Shadow', cursive; top: 80px; left: 90px; }
-        .track-2 { font-family: 'Comic Neue', cursive; top: 160px; left: 50px; }
-        .track-3 { font-family: 'Permanent Marker', cursive; top: 250px; left: 90px; }
-        .track-4 { font-family: 'Caveat', cursive; top: 300px; left: 175px; }
-        .track-5 { font-family: 'Press Start 2P', cursive; top: 250px; left: 260px; }
-        .track-6 { font-family: 'Rubik Doodle Shadow', cursive; top: 160px; left: 300px; }
-        .track-7 { font-family: 'Comic Neue', cursive; top: 80px; left: 260px; }
+        /* Adjusted positions for wider horizontal oval */
+        .track-0 { font-family: 'Press Start 2P', cursive; top: 10%; left: 50%; }
+        .track-1 { font-family: 'Rubik Doodle Shadow', cursive; top: 25%; left: 20%; }
+        .track-2 { font-family: 'Comic Neue', cursive; top: 50%; left: 10%; }
+        .track-3 { font-family: 'Permanent Marker', cursive; top: 75%; left: 20%; }
+        .track-4 { font-family: 'Caveat', cursive; top: 90%; left: 50%; }
+        .track-5 { font-family: 'Press Start 2P', cursive; top: 75%; left: 80%; }
+        .track-6 { font-family: 'Rubik Doodle Shadow', cursive; top: 50%; left: 90%; }
+        .track-7 { font-family: 'Comic Neue', cursive; top: 25%; left: 80%; }
         
-        /* Photo Slideshow - Half size */
+        /* Photo Slideshow - Smaller and moved up */
         .slideshow-container {
             position: absolute;
-            top: 50%;
+            top: 40%; /* Moved up from 50% */
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 180px; /* Half of previous size */
-            height: 180px; /* Half of previous size */
+            width: 160px; /* Smaller size */
+            height: 160px;
             z-index: 1;
             overflow: hidden;
             border-radius: 8px;
@@ -230,23 +232,26 @@
             }
             .carousel-container {
                 width: 350px;
-                height: 350px;
+                height: 300px;
             }
             .track {
                 font-size: 12px;
+                width: 100px;
+                margin-left: -50px;
             }
-            /* Adjusted track positions for mobile */
-            .track-0 { top: 25px; left: 140px; }
-            .track-1 { top: 65px; left: 70px; }
-            .track-2 { top: 130px; left: 35px; }
-            .track-3 { top: 210px; left: 70px; }
-            .track-4 { top: 250px; left: 140px; }
-            .track-5 { top: 210px; left: 210px; }
-            .track-6 { top: 130px; left: 245px; }
-            .track-7 { top: 65px; left: 210px; }
+            /* Adjusted positions for mobile */
+            .track-0 { top: 10%; left: 50%; }
+            .track-1 { top: 25%; left: 20%; }
+            .track-2 { top: 50%; left: 10%; }
+            .track-3 { top: 75%; left: 20%; }
+            .track-4 { top: 90%; left: 50%; }
+            .track-5 { top: 75%; left: 80%; }
+            .track-6 { top: 50%; left: 90%; }
+            .track-7 { top: 25%; left: 80%; }
             .slideshow-container {
                 width: 140px;
                 height: 140px;
+                top: 38%; /* Slightly higher on mobile */
             }
             .platform-links {
                 bottom: 25px;
