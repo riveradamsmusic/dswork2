@@ -141,7 +141,6 @@
             text-decoration: none;
             font-size: 14px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             transition: transform 0.2s ease;
         }
@@ -151,8 +150,11 @@
         }
         
         .platform-emoji {
-            font-size: 24px;
-            margin-bottom: 5px;
+            font-size: 20px; /* Reduced from 24px to 20px (about half the original size) */
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            text-align: center;
         }
         
         /* Mobile scaling */
@@ -172,11 +174,10 @@
                 bottom: 20px;
                 gap: 15px;
             }
-            .platform-link {
-                font-size: 12px;
-            }
             .platform-emoji {
-                font-size: 20px;
+                font-size: 18px; /* Slightly smaller for mobile */
+                width: 18px;
+                height: 18px;
             }
         }
     </style>
@@ -193,19 +194,15 @@
         <div class="platform-links" id="platformLinks">
             <a href="https://music.apple.com/us/artist/river-adams/1554125278" class="platform-link" target="_blank">
                 <span class="platform-emoji">🍎</span>
-                <span>Apple Music</span>
             </a>
             <a href="https://www.youtube.com/@RiverAdamsMusic" class="platform-link" target="_blank">
                 <span class="platform-emoji">▶️</span>
-                <span>YouTube</span>
             </a>
             <a href="https://open.spotify.com/artist/5ZV6CFDURLSarqDL7Wwn6n?si=0H_HMr3dTQefGaHi7RX7FQ" class="platform-link" target="_blank">
                 <span class="platform-emoji">🎵</span>
-                <span>Spotify</span>
             </a>
             <a href="https://www.instagram.com/riveradamsmusic/" class="platform-link" target="_blank">
                 <span class="platform-emoji">📸</span>
-                <span>Instagram</span>
             </a>
         </div>
     </div>
