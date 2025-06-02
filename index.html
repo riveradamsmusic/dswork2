@@ -64,15 +64,17 @@
             z-index: 5;
         }
         
-        /* Audio Carousel Styles - Expanded */
+        /* Audio Carousel Styles - Now using viewport units */
         .carousel-container {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 400px;
-            height: 400px;
+            width: 90vmin;
+            height: 90vmin;
+            max-width: 500px;
+            max-height: 500px;
         }
         
         .track {
@@ -87,6 +89,8 @@
             text-align: center;
             background: transparent;
             z-index: 2;
+            width: 120px;
+            margin-left: -60px;
         }
         
         .track:hover {
@@ -97,29 +101,33 @@
             color: #00ff00;
         }
         
-        /* Different fonts for each track - positions adjusted for larger circle */
-        .track-0 { font-family: 'Press Start 2P', cursive; top: 30px; left: 150px; }
-        .track-1 { font-family: 'Rubik Doodle Shadow', cursive; top: 70px; left: 80px; }
-        .track-2 { font-family: 'Comic Neue', cursive; top: 140px; left: 40px; }
-        .track-3 { font-family: 'Permanent Marker', cursive; top: 220px; left: 80px; }
-        .track-4 { font-family: 'Caveat', cursive; top: 260px; left: 150px; }
-        .track-5 { font-family: 'Press Start 2P', cursive; top: 220px; left: 220px; }
-        .track-6 { font-family: 'Rubik Doodle Shadow', cursive; top: 140px; left: 260px; }
-        .track-7 { font-family: 'Comic Neue', cursive; top: 70px; left: 220px; }
+        /* Position tracks in a circle */
+        .track-0 { top: 5%; left: 50%; }
+        .track-1 { top: 15%; left: 20%; }
+        .track-2 { top: 30%; left: 5%; }
+        .track-3 { top: 50%; left: 5%; }
+        .track-4 { top: 70%; left: 20%; }
+        .track-5 { top: 80%; left: 50%; }
+        .track-6 { top: 70%; left: 80%; }
+        .track-7 { top: 50%; left: 95%; }
+        .track-8 { top: 30%; left: 95%; }
+        .track-9 { top: 15%; left: 80%; }
         
-        /* Photo Slideshow Styles */
+        /* Photo Slideshow - Now responsive and smaller */
         .slideshow-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
+            width: 60vmin;
+            height: 60vmin;
+            max-width: 300px;
+            max-height: 300px;
             z-index: 1;
             overflow: hidden;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            background-color: rgba(20, 20, 20, 0.5); /* Fallback background */
+            background-color: rgba(20, 20, 20, 0.3);
         }
         
         .slide {
@@ -129,16 +137,6 @@
             object-fit: cover;
             opacity: 0;
             transition: all 1s ease;
-        }
-        
-        .error-text {
-            position: absolute;
-            color: white;
-            font-family: 'Caveat', cursive;
-            text-align: center;
-            width: 100%;
-            top: 50%;
-            transform: translateY(-50%);
         }
         
         /* Random transition classes */
@@ -239,15 +237,13 @@
                 font-size: 64px;
             }
             .track {
-                font-size: 16px;
-            }
-            .carousel-container {
-                width: 350px;
-                height: 350px;
+                font-size: 12px;
+                width: 100px;
+                margin-left: -50px;
             }
             .slideshow-container {
-                width: 180px;
-                height: 180px;
+                width: 50vmin;
+                height: 50vmin;
             }
             .platform-links {
                 bottom: 25px;
@@ -312,21 +308,11 @@
             { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3" }
         ];
 
-        // Photo files in RIVERADAMSPICZ folder - adjust these names to match your actual files
-        const photoFiles = [
-            'RIVERADAMSPICZ/1.jpg',
-            'RIVERADAMSPICZ/2.jpg',
-            'RIVERADAMSPICZ/3.jpg',
-            'RIVERADAMSPICZ/4.jpg',
-            'RIVERADAMSPICZ/5.jpg',
-            'RIVERADAMSPICZ/6.jpg',
-            'RIVERADAMSPICZ/7.jpg',
-            'RIVERADAMSPICZ/8.jpg',
-            'RIVERADAMSPICZ/9.jpg',
-            'RIVERADAMSPICZ/10.jpg',
-            'RIVERADAMSPICZ/11.jpg',
-            'RIVERADAMSPICZ/12.jpg'
-        ];
+        // Photo files - adjust these names to match your actual files
+        const photoFiles = [];
+        for (let i = 1; i <= 12; i++) {
+            photoFiles.push(`RIVERADAMSPICZ/${i}.jpg`);
+        }
 
         // Transition types
         const transitions = [
@@ -351,74 +337,63 @@
                 slide.src = photo;
                 slide.alt = `RiverAdams photo ${index + 1}`;
                 
-                // Add error handling for each image
+                // Error handling
                 slide.onerror = function() {
+                    console.error('Error loading image:', photo);
                     this.style.display = 'none';
-                    console.error('Failed to load image:', photo);
-                    // Create error message if this is the first slide
-                    if (index === 0 && !document.querySelector('.error-text')) {
-                        const errorMsg = document.createElement('div');
-                        errorMsg.className = 'error-text';
-                        errorMsg.textContent = 'Photos not found';
-                        slideshowContainer.appendChild(errorMsg);
-                    }
                 };
                 
                 slideshowContainer.appendChild(slide);
             });
 
-            // Start slideshow
             startSlideshow();
         }
 
         function startSlideshow() {
-            const slides = document.querySelectorAll('.slide');
+            const slides = document.querySelectorAll('.slide:not([style*="display: none"])');
             if (slides.length === 0) return;
 
-            // Show first slide that loads successfully
-            let firstVisibleSlide = 0;
-            while (firstVisibleSlide < slides.length && slides[firstVisibleSlide].naturalWidth === 0) {
-                firstVisibleSlide++;
-            }
-
-            if (firstVisibleSlide < slides.length) {
-                slides[firstVisibleSlide].classList.add('fade-in');
-                slides[firstVisibleSlide].style.opacity = '1';
-                currentSlide = firstVisibleSlide;
-            }
+            // Show first slide
+            slides[0].classList.add('fade-in');
+            slides[0].style.opacity = '1';
 
             // Set interval for slideshow
             slideInterval = setInterval(() => {
                 // Hide current slide
                 slides[currentSlide].className = 'slide';
                 
-                // Move to next slide that exists
-                let nextSlide = (currentSlide + 1) % slides.length;
-                let attempts = 0;
-                while (attempts < slides.length && slides[nextSlide].naturalWidth === 0) {
-                    nextSlide = (nextSlide + 1) % slides.length;
-                    attempts++;
-                }
-                
-                if (attempts >= slides.length) return; // No valid slides found
+                // Move to next slide
+                currentSlide = (currentSlide + 1) % slides.length;
                 
                 // Get random transition
                 const randomTransition = transitions[Math.floor(Math.random() * transitions.length)];
                 
                 // Apply transition
                 if (randomTransition.out) {
-                    slides[nextSlide].className = `slide ${randomTransition.out}`;
+                    slides[currentSlide].className = `slide ${randomTransition.out}`;
                 }
                 
                 // Force reflow
-                void slides[nextSlide].offsetWidth;
+                void slides[currentSlide].offsetWidth;
                 
                 // Apply transition in
-                slides[nextSlide].className = `slide ${randomTransition.in}`;
-                
-                currentSlide = nextSlide;
+                slides[currentSlide].className = `slide ${randomTransition.in}`;
                 
             }, 6000); // 6 seconds per slide
+        }
+
+        function positionTracks() {
+            const tracks = document.querySelectorAll('.track');
+            const radius = Math.min(carousel.offsetWidth, carousel.offsetHeight) * 0.4;
+            
+            tracks.forEach((track, index) => {
+                const angle = (index / tracks.length) * Math.PI * 2;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                
+                track.style.left = `calc(50% + ${x}px)`;
+                track.style.top = `calc(50% + ${y}px)`;
+            });
         }
 
         function initCarousel() {
@@ -427,7 +402,7 @@
             
             audioFiles.forEach((track, index) => {
                 const trackElement = document.createElement('div');
-                trackElement.className = `track track-${index % 8}`;
+                trackElement.className = `track track-${index}`;
                 trackElement.textContent = track.name;
                 trackElement.dataset.index = index;
                 carousel.appendChild(trackElement);
@@ -436,7 +411,6 @@
                     try {
                         const trackIndex = trackElement.dataset.index;
                         
-                        // If clicking the currently playing track
                         if (currentPlayingTrack === trackIndex) {
                             if (currentAudio.paused) {
                                 await currentAudio.play();
@@ -448,18 +422,15 @@
                             return;
                         }
                         
-                        // If switching to a different track
                         if (currentAudio) {
                             currentAudio.pause();
                             document.querySelector('.track.playing')?.classList.remove('playing');
                             currentAudio = null;
                         }
                         
-                        // Load and play new track
                         currentAudio = new Audio(track.file);
                         currentPlayingTrack = trackIndex;
                         
-                        // Set up error handling
                         currentAudio.addEventListener('error', (e) => {
                             console.error('Audio error:', e);
                             trackElement.classList.remove('playing');
@@ -469,7 +440,6 @@
                         await currentAudio.play();
                         trackElement.classList.add('playing');
                         
-                        // Handle track ending
                         currentAudio.onended = () => {
                             trackElement.classList.remove('playing');
                             currentPlayingTrack = null;
@@ -480,6 +450,9 @@
                     }
                 });
             });
+
+            positionTracks();
+            window.addEventListener('resize', positionTracks);
         }
         
         emojiWrapper.addEventListener('click', async () => {
@@ -504,7 +477,6 @@
             }, 300);
         });
 
-        // Clean up interval when page is closed
         window.addEventListener('beforeunload', () => {
             if (slideInterval) clearInterval(slideInterval);
         });
