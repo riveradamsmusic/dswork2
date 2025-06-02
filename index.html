@@ -124,7 +124,7 @@
             to { opacity: 0; transform: scale(1.2); }
         }
         
-        /* Platform Links Styles */
+        /* Sleek Platform Links Styles */
         .platform-links {
             position: fixed;
             bottom: 30px;
@@ -132,31 +132,50 @@
             right: 0;
             display: none;
             justify-content: center;
-            gap: 20px;
+            gap: 25px;
             z-index: 5;
         }
         
         .platform-link {
-            color: white;
+            color: rgba(255,255,255,0.7);
             text-decoration: none;
-            font-size: 14px;
             display: flex;
             align-items: center;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
+            opacity: 0.8;
         }
         
         .platform-link:hover {
-            transform: scale(1.1);
+            opacity: 1;
+            transform: scale(1.15);
+            color: rgba(255,255,255,0.9);
         }
         
         .platform-emoji {
-            font-size: 20px; /* Reduced from 24px to 20px (about half the original size) */
-            width: 20px;
-            height: 20px;
-            display: inline-block;
-            text-align: center;
+            font-size: 18px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(30,30,30,0.7);
+            border-radius: 50%;
+            padding: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
         }
         
+        .platform-link:hover .platform-emoji {
+            background: rgba(50,50,50,0.8);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+        }
+        
+        /* Darker emoji variants */
+        .platform-emoji.apple { color: #f8f8f8; }
+        .platform-emoji.youtube { color: #f0f0f0; }
+        .platform-emoji.spotify { color: #e0e0e0; }
+        .platform-emoji.instagram { color: #e8e8e8; }
+
         /* Mobile scaling */
         @media only screen and (max-width: 600px) {
             #emoji {
@@ -171,13 +190,14 @@
                 font-size: 16px;
             }
             .platform-links {
-                bottom: 20px;
-                gap: 15px;
+                bottom: 25px;
+                gap: 20px;
             }
             .platform-emoji {
-                font-size: 18px; /* Slightly smaller for mobile */
-                width: 18px;
-                height: 18px;
+                font-size: 16px;
+                width: 20px;
+                height: 20px;
+                padding: 6px;
             }
         }
     </style>
@@ -193,16 +213,16 @@
         </div>
         <div class="platform-links" id="platformLinks">
             <a href="https://music.apple.com/us/artist/river-adams/1554125278" class="platform-link" target="_blank">
-                <span class="platform-emoji">🍎</span>
+                <span class="platform-emoji apple">🍎</span>
             </a>
             <a href="https://www.youtube.com/@RiverAdamsMusic" class="platform-link" target="_blank">
-                <span class="platform-emoji">▶️</span>
+                <span class="platform-emoji youtube">▶️</span>
             </a>
             <a href="https://open.spotify.com/artist/5ZV6CFDURLSarqDL7Wwn6n?si=0H_HMr3dTQefGaHi7RX7FQ" class="platform-link" target="_blank">
-                <span class="platform-emoji">🎵</span>
+                <span class="platform-emoji spotify">🎵</span>
             </a>
             <a href="https://www.instagram.com/riveradamsmusic/" class="platform-link" target="_blank">
-                <span class="platform-emoji">📸</span>
+                <span class="platform-emoji instagram">📸</span>
             </a>
         </div>
     </div>
