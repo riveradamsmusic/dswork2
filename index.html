@@ -64,15 +64,15 @@
             z-index: 5;
         }
         
-        /* Audio Carousel Styles */
+        /* Audio Carousel Styles - Expanded */
         .carousel-container {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 300px;
-            height: 300px;
+            width: 400px; /* Expanded from 300px */
+            height: 400px; /* Expanded from 300px */
         }
         
         .track {
@@ -86,6 +86,7 @@
             font-size: 14px;
             text-align: center;
             background: transparent;
+            z-index: 2;
         }
         
         .track:hover {
@@ -96,15 +97,55 @@
             color: #00ff00;
         }
         
-        /* Different fonts for each track */
-        .track-0 { font-family: 'Press Start 2P', cursive; top: 20px; left: 100px; }
-        .track-1 { font-family: 'Rubik Doodle Shadow', cursive; top: 50px; left: 50px; }
-        .track-2 { font-family: 'Comic Neue', cursive; top: 100px; left: 20px; }
-        .track-3 { font-family: 'Permanent Marker', cursive; top: 170px; left: 50px; }
-        .track-4 { font-family: 'Caveat', cursive; top: 200px; left: 100px; }
-        .track-5 { font-family: 'Press Start 2P', cursive; top: 170px; left: 150px; }
-        .track-6 { font-family: 'Rubik Doodle Shadow', cursive; top: 100px; left: 180px; }
-        .track-7 { font-family: 'Comic Neue', cursive; top: 50px; left: 150px; }
+        /* Different fonts for each track - positions adjusted for larger circle */
+        .track-0 { font-family: 'Press Start 2P', cursive; top: 30px; left: 150px; }
+        .track-1 { font-family: 'Rubik Doodle Shadow', cursive; top: 70px; left: 80px; }
+        .track-2 { font-family: 'Comic Neue', cursive; top: 140px; left: 40px; }
+        .track-3 { font-family: 'Permanent Marker', cursive; top: 220px; left: 80px; }
+        .track-4 { font-family: 'Caveat', cursive; top: 260px; left: 150px; }
+        .track-5 { font-family: 'Press Start 2P', cursive; top: 220px; left: 220px; }
+        .track-6 { font-family: 'Rubik Doodle Shadow', cursive; top: 140px; left: 260px; }
+        .track-7 { font-family: 'Comic Neue', cursive; top: 70px; left: 220px; }
+        
+        /* Photo Slideshow Styles */
+        .slideshow-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            z-index: 1;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: all 1s ease;
+        }
+        
+        /* Random transition classes */
+        .fade-in { opacity: 1; }
+        .slide-up { opacity: 1; transform: translateY(0); }
+        .slide-down { opacity: 1; transform: translateY(0); }
+        .slide-left { opacity: 1; transform: translateX(0); }
+        .slide-right { opacity: 1; transform: translateX(0); }
+        .zoom-in { opacity: 1; transform: scale(1); }
+        .rotate-in { opacity: 1; transform: rotate(0) scale(1); }
+        
+        /* Initial states for transitions */
+        .initial-up { transform: translateY(-50px); }
+        .initial-down { transform: translateY(50px); }
+        .initial-left { transform: translateX(-50px); }
+        .initial-right { transform: translateX(50px); }
+        .initial-zoom { transform: scale(0.8); }
+        .initial-rotate { transform: rotate(15deg) scale(0.8); }
         
         /* Faster flash animation */
         .flash {
@@ -189,6 +230,14 @@
             .track {
                 font-size: 16px;
             }
+            .carousel-container {
+                width: 350px;
+                height: 350px;
+            }
+            .slideshow-container {
+                width: 180px;
+                height: 180px;
+            }
             .platform-links {
                 bottom: 25px;
                 gap: 20px;
@@ -209,6 +258,7 @@
         </div>
         <span id="text" class="handwritten">RiverAdam$</span>
         <div class="carousel-container" id="carousel">
+            <!-- Slideshow container will be added here by JavaScript -->
             <!-- Tracks will be added here -->
         </div>
         <div class="platform-links" id="platformLinks">
@@ -237,6 +287,8 @@
         let currentAudio = null;
         let currentPlayingTrack = null;
         let audioContext = null;
+        let slideInterval = null;
+        let currentSlide = 0;
 
         // Audio files in RIVERADAMS folder
         const audioFiles = [
@@ -250,8 +302,77 @@
             { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3" }
         ];
 
+        // Photo files in RIVERADAMSPICZ folder
+        const photoFiles = [];
+        for (let i = 1; i <= 12; i++) {
+            photoFiles.push(`RIVERADAMSPICZ/pic${i}.jpg`);
+        }
+
+        // Transition types
+        const transitions = [
+            { in: 'fade-in', out: '' },
+            { in: 'slide-up', out: 'initial-up' },
+            { in: 'slide-down', out: 'initial-down' },
+            { in: 'slide-left', out: 'initial-left' },
+            { in: 'slide-right', out: 'initial-right' },
+            { in: 'zoom-in', out: 'initial-zoom' },
+            { in: 'rotate-in', out: 'initial-rotate' }
+        ];
+
+        function createSlideshow() {
+            const slideshowContainer = document.createElement('div');
+            slideshowContainer.className = 'slideshow-container';
+            carousel.appendChild(slideshowContainer);
+
+            // Create slide elements
+            photoFiles.forEach((photo, index) => {
+                const slide = document.createElement('img');
+                slide.className = 'slide';
+                slide.src = photo;
+                slide.alt = `RiverAdams photo ${index + 1}`;
+                slideshowContainer.appendChild(slide);
+            });
+
+            // Start slideshow
+            startSlideshow();
+        }
+
+        function startSlideshow() {
+            const slides = document.querySelectorAll('.slide');
+            if (slides.length === 0) return;
+
+            // Show first slide
+            slides[0].classList.add('fade-in');
+            slides[0].style.opacity = '1';
+
+            // Set interval for slideshow
+            slideInterval = setInterval(() => {
+                // Hide current slide
+                slides[currentSlide].className = 'slide';
+                
+                // Move to next slide
+                currentSlide = (currentSlide + 1) % slides.length;
+                
+                // Get random transition
+                const randomTransition = transitions[Math.floor(Math.random() * transitions.length)];
+                
+                // Apply transition
+                if (randomTransition.out) {
+                    slides[currentSlide].className = `slide ${randomTransition.out}`;
+                }
+                
+                // Force reflow
+                void slides[currentSlide].offsetWidth;
+                
+                // Apply transition in
+                slides[currentSlide].className = `slide ${randomTransition.in}`;
+                
+            }, 6000); // 6 seconds per slide
+        }
+
         function initCarousel() {
             carousel.innerHTML = '';
+            createSlideshow();
             
             audioFiles.forEach((track, index) => {
                 const trackElement = document.createElement('div');
@@ -305,7 +426,6 @@
                         
                     } catch (e) {
                         console.error("Playback error:", e);
-                        // No alert - fails silently to prevent interruption
                     }
                 });
             });
@@ -331,6 +451,11 @@
                     initCarousel();
                 }, 2500);
             }, 300);
+        });
+
+        // Clean up interval when page is closed
+        window.addEventListener('beforeunload', () => {
+            if (slideInterval) clearInterval(slideInterval);
         });
     </script>
 </body>
