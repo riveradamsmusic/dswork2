@@ -124,6 +124,37 @@
             to { opacity: 0; transform: scale(1.2); }
         }
         
+        /* Platform Links Styles */
+        .platform-links {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            display: none;
+            justify-content: center;
+            gap: 20px;
+            z-index: 5;
+        }
+        
+        .platform-link {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+        
+        .platform-link:hover {
+            transform: scale(1.1);
+        }
+        
+        .platform-emoji {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
         /* Mobile scaling */
         @media only screen and (max-width: 600px) {
             #emoji {
@@ -137,6 +168,16 @@
             .track {
                 font-size: 16px;
             }
+            .platform-links {
+                bottom: 20px;
+                gap: 15px;
+            }
+            .platform-link {
+                font-size: 12px;
+            }
+            .platform-emoji {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
@@ -149,6 +190,24 @@
         <div class="carousel-container" id="carousel">
             <!-- Tracks will be added here -->
         </div>
+        <div class="platform-links" id="platformLinks">
+            <a href="https://music.apple.com/us/artist/river-adams/1554125278" class="platform-link" target="_blank">
+                <span class="platform-emoji">🍎</span>
+                <span>Apple Music</span>
+            </a>
+            <a href="https://www.youtube.com/@RiverAdamsMusic" class="platform-link" target="_blank">
+                <span class="platform-emoji">▶️</span>
+                <span>YouTube</span>
+            </a>
+            <a href="https://open.spotify.com/artist/5ZV6CFDURLSarqDL7Wwn6n?si=0H_HMr3dTQefGaHi7RX7FQ" class="platform-link" target="_blank">
+                <span class="platform-emoji">🎵</span>
+                <span>Spotify</span>
+            </a>
+            <a href="https://www.instagram.com/riveradamsmusic/" class="platform-link" target="_blank">
+                <span class="platform-emoji">📸</span>
+                <span>Instagram</span>
+            </a>
+        </div>
     </div>
 
     <script>
@@ -156,6 +215,7 @@
         const emojiWrapper = document.querySelector('.emoji-wrapper');
         const text = document.getElementById('text');
         const carousel = document.getElementById('carousel');
+        const platformLinks = document.getElementById('platformLinks');
         
         let currentAudio = null;
         let currentPlayingTrack = null;
@@ -250,6 +310,7 @@
                 setTimeout(() => {
                     text.style.display = 'none';
                     carousel.style.display = 'block';
+                    platformLinks.style.display = 'flex';
                     initCarousel();
                 }, 2500);
             }, 300);
