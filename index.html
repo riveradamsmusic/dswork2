@@ -27,7 +27,7 @@
             letter-spacing: 1px;
         }
         
-        /* Centered Emoji Styles */
+        /* Centered Emoji */
         .emoji-wrapper {
             position: fixed;
             top: 50%;
@@ -52,7 +52,7 @@
             transform: scale(0.8);
         }
         
-        /* Centered Text Styles */
+        /* Centered Text */
         #text {
             position: fixed;
             top: 50%;
@@ -64,7 +64,22 @@
             z-index: 5;
         }
         
-        /* Audio Carousel Styles - MOVED 1.2cm RIGHT AND 0.5cm DOWN */
+        /* Standalone Centered Slideshow */
+        .slideshow-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px;
+            height: 90px;
+            z-index: 1;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background-color: rgba(20, 20, 20, 0.3);
+        }
+        
+        /* Offset Carousel (1.2cm right, 0.5cm down) */
         .carousel-container {
             display: none;
             position: fixed;
@@ -73,6 +88,7 @@
             transform: translate(calc(-50% + 1.2cm), calc(-50% + 0.5cm));
             width: 390px;
             height: 390px;
+            z-index: 2;
         }
         
         .track {
@@ -86,7 +102,7 @@
             font-size: 18.2px;
             text-align: center;
             background: transparent;
-            z-index: 2;
+            z-index: 3;
         }
         
         .track:hover {
@@ -97,7 +113,7 @@
             color: #00ff00;
         }
         
-        /* Original track positions (unchanged) */
+        /* Track positions (unchanged) */
         .track-0 { font-family: 'Press Start 2P', cursive; top: 26px; left: 130px; }
         .track-1 { font-family: 'Rubik Doodle Shadow', cursive; top: 65px; left: 65px; }
         .track-2 { font-family: 'Comic Neue', cursive; top: 130px; left: 26px; }
@@ -107,21 +123,7 @@
         .track-6 { font-family: 'Rubik Doodle Shadow', cursive; top: 130px; left: 234px; }
         .track-7 { font-family: 'Comic Neue', cursive; top: 65px; left: 195px; }
         
-        /* Photo Slideshow (unchanged) */
-        .slideshow-container {
-            position: absolute;
-            top: 45%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90px;
-            height: 90px;
-            z-index: 1;
-            overflow: hidden;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            background-color: rgba(20, 20, 20, 0.3);
-        }
-        
+        /* Slide transitions */
         .slide {
             position: absolute;
             width: 100%;
@@ -131,7 +133,6 @@
             transition: all 1s ease;
         }
         
-        /* Original transition classes (unchanged) */
         .fade-in { opacity: 1; }
         .slide-up { opacity: 1; transform: translateY(0); }
         .slide-down { opacity: 1; transform: translateY(0); }
@@ -140,7 +141,6 @@
         .zoom-in { opacity: 1; transform: scale(1); }
         .rotate-in { opacity: 1; transform: rotate(0) scale(1); }
         
-        /* Original initial states (unchanged) */
         .initial-up { transform: translateY(-50px); }
         .initial-down { transform: translateY(50px); }
         .initial-left { transform: translateX(-50px); }
@@ -148,7 +148,6 @@
         .initial-zoom { transform: scale(0.8); }
         .initial-rotate { transform: rotate(15deg) scale(0.8); }
         
-        /* Original flash animation (unchanged) */
         .flash {
             animation: flash 0.5s 5 forwards;
         }
@@ -166,7 +165,7 @@
             to { opacity: 0; transform: scale(1.2); }
         }
         
-        /* Original Platform Links (unchanged) */
+        /* Platform Links */
         .platform-links {
             position: fixed;
             bottom: 30px;
@@ -212,13 +211,12 @@
             box-shadow: 0 3px 12px rgba(0,0,0,0.4);
         }
         
-        /* Original emoji variants (unchanged) */
         .platform-emoji.apple { color: #f8f8f8; }
         .platform-emoji.youtube { color: #f0f0f0; }
         .platform-emoji.spotify { color: #e0e0e0; }
         .platform-emoji.instagram { color: #e8e8e8; }
 
-        /* Original mobile scaling (unchanged) */
+        /* Mobile */
         @media only screen and (max-width: 600px) {
             #emoji {
                 font-size: 100px;
@@ -246,7 +244,6 @@
             .slideshow-container {
                 width: 80px;
                 height: 80px;
-                top: 43%;
             }
             .platform-links {
                 bottom: 25px;
@@ -263,13 +260,21 @@
 </head>
 <body>
     <div id="container">
+        <!-- Emoji Trigger -->
         <div class="emoji-wrapper">
             <span id="emoji" class="handwritten">📼</span>
         </div>
+        
+        <!-- Hidden Text -->
         <span id="text" class="handwritten">RiverAdam$</span>
-        <div class="carousel-container" id="carousel">
-            <!-- Slideshow and tracks will be added here by JavaScript -->
-        </div>
+        
+        <!-- Standalone Slideshow (Center) -->
+        <div class="slideshow-container" id="slideshow"></div>
+        
+        <!-- Offset Carousel (Right 1.2cm, Down 0.5cm) -->
+        <div class="carousel-container" id="carousel"></div>
+        
+        <!-- Platform Links -->
         <div class="platform-links" id="platformLinks">
             <a href="https://music.apple.com/us/artist/river-adams/1554125278" class="platform-link" target="_blank">
                 <span class="platform-emoji apple">🍎</span>
@@ -291,6 +296,7 @@
         const emojiWrapper = document.querySelector('.emoji-wrapper');
         const text = document.getElementById('text');
         const carousel = document.getElementById('carousel');
+        const slideshow = document.getElementById('slideshow');
         const platformLinks = document.getElementById('platformLinks');
         
         let currentAudio = null;
@@ -299,7 +305,7 @@
         let slideInterval = null;
         let currentSlide = 0;
 
-        // Audio files in RIVERADAMS folder
+        // Audio files
         const audioFiles = [
             { name: "21 Century", file: "RIVERADAMS/21_Century_copy.mp3" },
             { name: "Grey", file: "RIVERADAMS/grey_copy.mp3" },
@@ -311,13 +317,13 @@
             { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3" }
         ];
 
-        // Photo files in RIVERADAMSPICZ folder
+        // Photo files
         const photoFiles = [];
         for (let i = 1; i <= 12; i++) {
             photoFiles.push(`RIVERADAMSPICZ/${i}.jpg`);
         }
 
-        // Transition types
+        // Transitions
         const transitions = [
             { in: 'fade-in', out: '' },
             { in: 'slide-up', out: 'initial-up' },
@@ -328,65 +334,41 @@
             { in: 'rotate-in', out: 'initial-rotate' }
         ];
 
+        // Initialize slideshow
         function createSlideshow() {
-            const slideshowContainer = document.createElement('div');
-            slideshowContainer.className = 'slideshow-container';
-            carousel.appendChild(slideshowContainer);
-
-            // Create slide elements
             photoFiles.forEach((photo, index) => {
                 const slide = document.createElement('img');
                 slide.className = 'slide';
                 slide.src = photo;
                 slide.alt = `RiverAdams photo ${index + 1}`;
-                
-                // Error handling
-                slide.onerror = function() {
-                    console.error('Error loading image:', photo);
-                    this.style.display = 'none';
-                };
-                
-                slideshowContainer.appendChild(slide);
+                slide.onerror = () => slide.style.display = 'none';
+                slideshow.appendChild(slide);
             });
-
             startSlideshow();
         }
 
+        // Start slideshow transitions
         function startSlideshow() {
             const slides = document.querySelectorAll('.slide:not([style*="display: none"])');
             if (slides.length === 0) return;
 
-            // Show first slide
             slides[0].classList.add('fade-in');
             slides[0].style.opacity = '1';
 
-            // Set interval for slideshow
             slideInterval = setInterval(() => {
-                // Hide current slide
                 slides[currentSlide].className = 'slide';
-                
-                // Move to next slide
                 currentSlide = (currentSlide + 1) % slides.length;
                 
-                // Get random transition
-                const randomTransition = transitions[Math.floor(Math.random() * transitions.length)];
+                const transition = transitions[Math.floor(Math.random() * transitions.length)];
+                if (transition.out) slides[currentSlide].className = `slide ${transition.out}`;
                 
-                // Apply transition
-                if (randomTransition.out) {
-                    slides[currentSlide].className = `slide ${randomTransition.out}`;
-                }
-                
-                // Force reflow
-                void slides[currentSlide].offsetWidth;
-                
-                // Apply transition in
-                slides[currentSlide].className = `slide ${randomTransition.in}`;
-                
-            }, 6000); // 6 seconds per slide
+                void slides[currentSlide].offsetWidth; // Force reflow
+                slides[currentSlide].className = `slide ${transition.in}`;
+            }, 6000);
         }
 
+        // Initialize carousel
         function initCarousel() {
-            carousel.innerHTML = '';
             createSlideshow();
             
             audioFiles.forEach((track, index) => {
@@ -398,42 +380,25 @@
                 
                 trackElement.addEventListener('click', async () => {
                     try {
-                        const trackIndex = trackElement.dataset.index;
-                        
-                        if (currentPlayingTrack === trackIndex) {
-                            if (currentAudio.paused) {
-                                await currentAudio.play();
-                                trackElement.classList.add('playing');
-                            } else {
-                                currentAudio.pause();
-                                trackElement.classList.remove('playing');
-                            }
+                        if (currentPlayingTrack === index) {
+                            if (currentAudio.paused) await currentAudio.play();
+                            else currentAudio.pause();
                             return;
                         }
                         
-                        if (currentAudio) {
-                            currentAudio.pause();
-                            document.querySelector('.track.playing')?.classList.remove('playing');
-                            currentAudio = null;
-                        }
+                        if (currentAudio) currentAudio.pause();
                         
                         currentAudio = new Audio(track.file);
-                        currentPlayingTrack = trackIndex;
-                        
-                        currentAudio.addEventListener('error', (e) => {
-                            console.error('Audio error:', e);
-                            trackElement.classList.remove('playing');
-                            currentPlayingTrack = null;
-                        });
-                        
+                        currentPlayingTrack = index;
                         await currentAudio.play();
-                        trackElement.classList.add('playing');
                         
                         currentAudio.onended = () => {
-                            trackElement.classList.remove('playing');
+                            document.querySelector('.track.playing')?.classList.remove('playing');
                             currentPlayingTrack = null;
                         };
                         
+                        document.querySelector('.track.playing')?.classList.remove('playing');
+                        trackElement.classList.add('playing');
                     } catch (e) {
                         console.error("Playback error:", e);
                     }
@@ -441,6 +406,7 @@
             });
         }
         
+        // Emoji click handler
         emojiWrapper.addEventListener('click', async () => {
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -463,6 +429,7 @@
             }, 300);
         });
 
+        // Cleanup
         window.addEventListener('beforeunload', () => {
             if (slideInterval) clearInterval(slideInterval);
         });
