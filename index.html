@@ -77,28 +77,60 @@
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             background-color: rgba(20, 20, 20, 0.3);
+            display: none; /* Initially hidden */
         }
         
-        /* Loading Spinner */
+        /* Modern Loading Spinner */
         .spinner {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+            width: 50px;
+            height: 50px;
             z-index: 2;
+            display: none; /* Initially hidden */
+        }
+        
+        .spinner::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: #9b59b6;
+            border-bottom-color: #9b59b6;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .spinner::after {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-left-color: #3498db;
+            border-right-color: #3498db;
+            animation: spinReverse 1s linear infinite;
         }
         
         @keyframes spin {
-            to { transform: translate(-50%, -50%) rotate(360deg); }
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
         
-        /* Offset Carousel (0.5cm right, 1.0cm down) */
+        @keyframes spinReverse {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(-360deg); }
+        }
+        
+        /* Offset Carousel */
         .carousel-container {
             display: none;
             position: fixed;
@@ -132,7 +164,7 @@
             color: #00ff00;
         }
         
-        /* Track positions (unchanged) */
+        /* Track positions */
         .track-0 { font-family: 'Press Start 2P', cursive; top: 26px; left: 130px; }
         .track-1 { font-family: 'Rubik Doodle Shadow', cursive; top: 65px; left: 65px; }
         .track-2 { font-family: 'Comic Neue', cursive; top: 130px; left: 26px; }
@@ -278,10 +310,10 @@
         .game-character {
             position: fixed;
             top: 20px;
-            left: -50px;
+            left: 25%; /* Starts 25% from the left */
             width: 40px;
             height: 40px;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5" fill="%2300ff00"/><rect x="9" y="13" width="6" height="8" fill="%2300ff00"/><rect x="6" y="15" width="3" height="2" fill="%2300ff00"/><rect x="15" y="15" width="3" height="2" fill="%2300ff00"/></svg>');
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%239b59b6" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-5-9h10v2H7z"/></svg>');
             background-size: contain;
             background-repeat: no-repeat;
             z-index: 100;
@@ -356,7 +388,7 @@
             <div class="spinner"></div>
         </div>
         
-        <!-- Offset Carousel (Right 1.2cm, Down 0.5cm) -->
+        <!-- Offset Carousel -->
         <div class="carousel-container" id="carousel"></div>
         
         <!-- Video Game Character -->
@@ -433,6 +465,9 @@
 
         // Initialize slideshow with loading spinner
         function createSlideshow() {
+            spinner.style.display = 'block';
+            slideshow.style.display = 'block';
+            
             photoFiles.forEach((photo, index) => {
                 const slide = document.createElement('img');
                 slide.className = 'slide';
@@ -490,10 +525,12 @@
         // Animate game character
         function animateCharacter(duration) {
             gameCharacter.style.display = 'block';
-            gameCharacter.style.left = '-50px';
+            gameCharacter.style.left = '25%'; // Start 25% from left
             
             const screenWidth = window.innerWidth;
-            const moveDistance = screenWidth + 100;
+            const startPosition = screenWidth * 0.25;
+            const endPosition = screenWidth * 0.75; // Ends 25% from right
+            const moveDistance = endPosition - startPosition;
             const moveDuration = duration * 1000; // Convert to milliseconds
             
             // Reset any existing animation
@@ -509,13 +546,13 @@
                 const progress = (now - startTime) / moveDuration;
                 
                 if (progress >= 1) {
-                    gameCharacter.style.left = `${screenWidth + 50}px`;
+                    gameCharacter.style.left = `${endPosition}px`;
                     clearInterval(characterAnimation);
                     setTimeout(() => {
                         gameCharacter.style.display = 'none';
                     }, 1000);
                 } else {
-                    const currentPos = -50 + (moveDistance * progress);
+                    const currentPos = startPosition + (moveDistance * progress);
                     gameCharacter.style.left = `${currentPos}px`;
                 }
             }, 16); // ~60fps
@@ -523,8 +560,6 @@
 
         // Initialize carousel
         function initCarousel() {
-            createSlideshow();
-            
             audioFiles.forEach((track, index) => {
                 const trackElement = document.createElement('div');
                 trackElement.className = `track track-${index % 8}`;
@@ -593,6 +628,7 @@
                     text.style.display = 'none';
                     carousel.style.display = 'block';
                     platformLinks.style.display = 'flex';
+                    createSlideshow(); // Now starts after the flashes
                     initCarousel();
                 }, 2500);
             }, 300);
