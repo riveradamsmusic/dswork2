@@ -64,13 +64,13 @@
             z-index: 5;
         }
         
-        /* Audio Carousel Styles - Scaled up 1.3x (390px) and moved 1.2cm right */
+        /* Audio Carousel Styles - MOVED 1.2cm RIGHT AND 0.5cm DOWN */
         .carousel-container {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(calc(-50% + 1.2cm), -50%); /* Added 1.2cm right offset */
+            transform: translate(calc(-50% + 1.2cm), calc(-50% + 0.5cm));
             width: 390px;
             height: 390px;
         }
@@ -97,7 +97,7 @@
             color: #00ff00;
         }
         
-        /* Original track positions scaled by 1.3 */
+        /* Original track positions (unchanged) */
         .track-0 { font-family: 'Press Start 2P', cursive; top: 26px; left: 130px; }
         .track-1 { font-family: 'Rubik Doodle Shadow', cursive; top: 65px; left: 65px; }
         .track-2 { font-family: 'Comic Neue', cursive; top: 130px; left: 26px; }
@@ -107,7 +107,7 @@
         .track-6 { font-family: 'Rubik Doodle Shadow', cursive; top: 130px; left: 234px; }
         .track-7 { font-family: 'Comic Neue', cursive; top: 65px; left: 195px; }
         
-        /* Photo Slideshow - Remains small (90px) and moved up */
+        /* Photo Slideshow (unchanged) */
         .slideshow-container {
             position: absolute;
             top: 45%;
@@ -128,81 +128,27 @@
             height: 100%;
             object-fit: cover;
             opacity: 0;
-            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 1s ease;
         }
         
-        /* Loading Spinner */
-        .loader {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top: 3px solid white;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            z-index: 0;
-        }
-        
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        
-        /* Enhanced Transition Classes */
+        /* Original transition classes (unchanged) */
         .fade-in { opacity: 1; }
-        .slide-up { opacity: 1; transform: translateY(0) scale(1); }
-        .slide-down { opacity: 1; transform: translateY(0) scale(1); }
-        .slide-left { opacity: 1; transform: translateX(0) scale(1); }
-        .slide-right { opacity: 1; transform: translateX(0) scale(1); }
+        .slide-up { opacity: 1; transform: translateY(0); }
+        .slide-down { opacity: 1; transform: translateY(0); }
+        .slide-left { opacity: 1; transform: translateX(0); }
+        .slide-right { opacity: 1; transform: translateX(0); }
         .zoom-in { opacity: 1; transform: scale(1); }
         .rotate-in { opacity: 1; transform: rotate(0) scale(1); }
-        .explode-in { 
-            opacity: 1; 
-            transform: scale(1); 
-            animation: explode 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .spin-in {
-            opacity: 1;
-            transform: rotate(0) scale(1);
-            animation: spinIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .flip-in {
-            opacity: 1;
-            transform: rotateY(0) scale(1);
-            animation: flipIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
         
-        @keyframes explode {
-            0% { transform: scale(0); opacity: 0; }
-            70% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); }
-        }
+        /* Original initial states (unchanged) */
+        .initial-up { transform: translateY(-50px); }
+        .initial-down { transform: translateY(50px); }
+        .initial-left { transform: translateX(-50px); }
+        .initial-right { transform: translateX(50px); }
+        .initial-zoom { transform: scale(0.8); }
+        .initial-rotate { transform: rotate(15deg) scale(0.8); }
         
-        @keyframes spinIn {
-            0% { transform: rotate(-180deg) scale(0); opacity: 0; }
-            100% { transform: rotate(0) scale(1); opacity: 1; }
-        }
-        
-        @keyframes flipIn {
-            0% { transform: rotateY(90deg) scale(0.8); opacity: 0; }
-            100% { transform: rotateY(0) scale(1); opacity: 1; }
-        }
-        
-        /* Initial states for transitions */
-        .initial-up { transform: translateY(-50px) scale(0.9); }
-        .initial-down { transform: translateY(50px) scale(0.9); }
-        .initial-left { transform: translateX(-50px) scale(0.9); }
-        .initial-right { transform: translateX(50px) scale(0.9); }
-        .initial-zoom { transform: scale(0); }
-        .initial-rotate { transform: rotate(90deg) scale(0); }
-        .initial-explode { transform: scale(0); opacity: 0; }
-        .initial-spin { transform: rotate(-180deg) scale(0); opacity: 0; }
-        .initial-flip { transform: rotateY(90deg) scale(0.8); opacity: 0; }
-        
-        /* Faster flash animation */
+        /* Original flash animation (unchanged) */
         .flash {
             animation: flash 0.5s 5 forwards;
         }
@@ -220,7 +166,7 @@
             to { opacity: 0; transform: scale(1.2); }
         }
         
-        /* Sleek Platform Links Styles */
+        /* Original Platform Links (unchanged) */
         .platform-links {
             position: fixed;
             bottom: 30px;
@@ -266,13 +212,13 @@
             box-shadow: 0 3px 12px rgba(0,0,0,0.4);
         }
         
-        /* Darker emoji variants */
+        /* Original emoji variants (unchanged) */
         .platform-emoji.apple { color: #f8f8f8; }
         .platform-emoji.youtube { color: #f0f0f0; }
         .platform-emoji.spotify { color: #e0e0e0; }
         .platform-emoji.instagram { color: #e8e8e8; }
 
-        /* Mobile scaling */
+        /* Original mobile scaling (unchanged) */
         @media only screen and (max-width: 600px) {
             #emoji {
                 font-size: 100px;
@@ -289,7 +235,6 @@
             .track {
                 font-size: 14px;
             }
-            /* Original positions for mobile */
             .track-0 { top: 20px; left: 100px; }
             .track-1 { top: 50px; left: 50px; }
             .track-2 { top: 100px; left: 20px; }
@@ -353,8 +298,6 @@
         let audioContext = null;
         let slideInterval = null;
         let currentSlide = 0;
-        let slideshowReady = false;
-        let loadedImages = 0;
 
         // Audio files in RIVERADAMS folder
         const audioFiles = [
@@ -374,7 +317,7 @@
             photoFiles.push(`RIVERADAMSPICZ/${i}.jpg`);
         }
 
-        // Enhanced transition types
+        // Transition types
         const transitions = [
             { in: 'fade-in', out: '' },
             { in: 'slide-up', out: 'initial-up' },
@@ -382,38 +325,8 @@
             { in: 'slide-left', out: 'initial-left' },
             { in: 'slide-right', out: 'initial-right' },
             { in: 'zoom-in', out: 'initial-zoom' },
-            { in: 'rotate-in', out: 'initial-rotate' },
-            { in: 'explode-in', out: 'initial-explode' },
-            { in: 'spin-in', out: 'initial-spin' },
-            { in: 'flip-in', out: 'initial-flip' }
+            { in: 'rotate-in', out: 'initial-rotate' }
         ];
-
-        // Preload images for better performance
-        function preloadImages() {
-            const loader = document.createElement('div');
-            loader.className = 'loader';
-            carousel.appendChild(loader);
-
-            photoFiles.forEach((photo, index) => {
-                const img = new Image();
-                img.src = photo;
-                img.onload = () => {
-                    loadedImages++;
-                    if (loadedImages === photoFiles.length) {
-                        slideshowReady = true;
-                        loader.remove();
-                    }
-                };
-                img.onerror = () => {
-                    console.error('Error loading image:', photo);
-                    loadedImages++; // Count even if error to prevent infinite waiting
-                    if (loadedImages === photoFiles.length) {
-                        slideshowReady = true;
-                        loader.remove();
-                    }
-                };
-            });
-        }
 
         function createSlideshow() {
             const slideshowContainer = document.createElement('div');
@@ -426,7 +339,6 @@
                 slide.className = 'slide';
                 slide.src = photo;
                 slide.alt = `RiverAdams photo ${index + 1}`;
-                slide.loading = 'lazy'; // Lazy loading for better performance
                 
                 // Error handling
                 slide.onerror = function() {
@@ -437,28 +349,18 @@
                 slideshowContainer.appendChild(slide);
             });
 
-            if (slideshowReady) {
-                startSlideshow();
-            } else {
-                const checkReady = setInterval(() => {
-                    if (slideshowReady) {
-                        clearInterval(checkReady);
-                        startSlideshow();
-                    }
-                }, 100);
-            }
+            startSlideshow();
         }
 
         function startSlideshow() {
             const slides = document.querySelectorAll('.slide:not([style*="display: none"])');
             if (slides.length === 0) return;
 
-            // Show first slide with random transition
-            const firstTransition = transitions[Math.floor(Math.random() * transitions.length)];
-            slides[0].className = `slide ${firstTransition.in}`;
+            // Show first slide
+            slides[0].classList.add('fade-in');
             slides[0].style.opacity = '1';
 
-            // Set interval for slideshow with random timing (4-6 seconds)
+            // Set interval for slideshow
             slideInterval = setInterval(() => {
                 // Hide current slide
                 slides[currentSlide].className = 'slide';
@@ -480,12 +382,11 @@
                 // Apply transition in
                 slides[currentSlide].className = `slide ${randomTransition.in}`;
                 
-            }, 5000); // 5 seconds base timing
+            }, 6000); // 6 seconds per slide
         }
 
         function initCarousel() {
             carousel.innerHTML = '';
-            preloadImages();
             createSlideshow();
             
             audioFiles.forEach((track, index) => {
