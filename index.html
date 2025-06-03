@@ -79,6 +79,25 @@
             background-color: rgba(20, 20, 20, 0.3);
         }
         
+        /* Loading Spinner */
+        .spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            z-index: 2;
+        }
+        
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
         /* Offset Carousel (0.5cm right, 1.0cm down) */
         .carousel-container {
             display: none;
@@ -133,6 +152,7 @@
             transition: all 1s ease;
         }
         
+        /* Crazy Transitions */
         .fade-in { opacity: 1; }
         .slide-up { opacity: 1; transform: translateY(0); }
         .slide-down { opacity: 1; transform: translateY(0); }
@@ -140,6 +160,20 @@
         .slide-right { opacity: 1; transform: translateX(0); }
         .zoom-in { opacity: 1; transform: scale(1); }
         .rotate-in { opacity: 1; transform: rotate(0) scale(1); }
+        .explode-in { 
+            opacity: 1; 
+            transform: scale(1); 
+            animation: explode 0.8s ease-out forwards;
+        }
+        .pixelate-in {
+            opacity: 1;
+            filter: blur(0);
+            animation: pixelate 1.2s steps(10) forwards;
+        }
+        .glitch-in {
+            opacity: 1;
+            animation: glitch 0.8s linear forwards;
+        }
         
         .initial-up { transform: translateY(-50px); }
         .initial-down { transform: translateY(50px); }
@@ -147,6 +181,30 @@
         .initial-right { transform: translateX(50px); }
         .initial-zoom { transform: scale(0.8); }
         .initial-rotate { transform: rotate(15deg) scale(0.8); }
+        .initial-explode { transform: scale(0); opacity: 0; }
+        .initial-pixelate { filter: blur(10px); opacity: 0; }
+        .initial-glitch { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); opacity: 0; }
+        
+        /* Crazy Transition Animations */
+        @keyframes explode {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes pixelate {
+            0% { filter: blur(10px) contrast(200%); opacity: 0; }
+            100% { filter: blur(0) contrast(100%); opacity: 1; }
+        }
+        
+        @keyframes glitch {
+            0% { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); opacity: 0; }
+            20% { clip-path: polygon(0 20%, 100% 20%, 100% 30%, 0 30%); opacity: 0.8; }
+            40% { clip-path: polygon(0 40%, 100% 40%, 100% 60%, 0 60%); opacity: 0.3; }
+            60% { clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%); opacity: 0.8; }
+            80% { clip-path: polygon(0 80%, 100% 80%, 100% 90%, 0 90%); opacity: 0.3; }
+            100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); opacity: 1; }
+        }
         
         .flash {
             animation: flash 0.5s 5 forwards;
@@ -216,6 +274,27 @@
         .platform-emoji.spotify { color: #e0e0e0; }
         .platform-emoji.instagram { color: #e8e8e8; }
 
+        /* Video Game Character */
+        .game-character {
+            position: fixed;
+            top: 20px;
+            left: -50px;
+            width: 40px;
+            height: 40px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5" fill="%2300ff00"/><rect x="9" y="13" width="6" height="8" fill="%2300ff00"/><rect x="6" y="15" width="3" height="2" fill="%2300ff00"/><rect x="15" y="15" width="3" height="2" fill="%2300ff00"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 100;
+            display: none;
+            animation: walk 0.5s steps(2) infinite;
+        }
+        
+        @keyframes walk {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+        }
+        
         /* Mobile */
         @media only screen and (max-width: 600px) {
             #emoji {
@@ -255,6 +334,10 @@
                 height: 20px;
                 padding: 6px;
             }
+            .game-character {
+                width: 30px;
+                height: 30px;
+            }
         }
     </style>
 </head>
@@ -269,10 +352,15 @@
         <span id="text" class="handwritten">RiverAdam$</span>
         
         <!-- Standalone Slideshow (Center) -->
-        <div class="slideshow-container" id="slideshow"></div>
+        <div class="slideshow-container" id="slideshow">
+            <div class="spinner"></div>
+        </div>
         
         <!-- Offset Carousel (Right 1.2cm, Down 0.5cm) -->
         <div class="carousel-container" id="carousel"></div>
+        
+        <!-- Video Game Character -->
+        <div class="game-character" id="gameCharacter"></div>
         
         <!-- Platform Links -->
         <div class="platform-links" id="platformLinks">
@@ -298,23 +386,28 @@
         const carousel = document.getElementById('carousel');
         const slideshow = document.getElementById('slideshow');
         const platformLinks = document.getElementById('platformLinks');
+        const gameCharacter = document.getElementById('gameCharacter');
+        const spinner = document.querySelector('.spinner');
         
         let currentAudio = null;
         let currentPlayingTrack = null;
         let audioContext = null;
         let slideInterval = null;
         let currentSlide = 0;
+        let characterAnimation = null;
+        let loadedImages = 0;
+        let totalImages = 0;
 
         // Audio files
         const audioFiles = [
-            { name: "21 Century", file: "RIVERADAMS/21_Century_copy.mp3" },
-            { name: "Grey", file: "RIVERADAMS/grey_copy.mp3" },
-            { name: "Mr. Solo", file: "RIVERADAMS/Mr_Solo_copy.mp3" },
-            { name: "Opportunities", file: "RIVERADAMS/Opportunities_copy.mp3" },
-            { name: "Rap (feat. AFEEGO)", file: "RIVERADAMS/Rap_feat_AFEEGO_copy.mp3" },
-            { name: "Spoken Word", file: "RIVERADAMS/Spoken_Word_copy.mp3" },
-            { name: "Trying", file: "RIVERADAMS/Trying_copy.mp3" },
-            { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3" }
+            { name: "21 Century", file: "RIVERADAMS/21_Century_copy.mp3", duration: 180 },
+            { name: "Grey", file: "RIVERADAMS/grey_copy.mp3", duration: 210 },
+            { name: "Mr. Solo", file: "RIVERADAMS/Mr_Solo_copy.mp3", duration: 195 },
+            { name: "Opportunities", file: "RIVERADAMS/Opportunities_copy.mp3", duration: 225 },
+            { name: "Rap (feat. AFEEGO)", file: "RIVERADAMS/Rap_feat_AFEEGO_copy.mp3", duration: 240 },
+            { name: "Spoken Word", file: "RIVERADAMS/Spoken_Word_copy.mp3", duration: 180 },
+            { name: "Trying", file: "RIVERADAMS/Trying_copy.mp3", duration: 200 },
+            { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3", duration: 190 }
         ];
 
         // Photo files
@@ -322,8 +415,9 @@
         for (let i = 1; i <= 12; i++) {
             photoFiles.push(`RIVERADAMSPICZ/${i}.jpg`);
         }
+        totalImages = photoFiles.length;
 
-        // Transitions
+        // Enhanced transitions
         const transitions = [
             { in: 'fade-in', out: '' },
             { in: 'slide-up', out: 'initial-up' },
@@ -331,23 +425,49 @@
             { in: 'slide-left', out: 'initial-left' },
             { in: 'slide-right', out: 'initial-right' },
             { in: 'zoom-in', out: 'initial-zoom' },
-            { in: 'rotate-in', out: 'initial-rotate' }
+            { in: 'rotate-in', out: 'initial-rotate' },
+            { in: 'explode-in', out: 'initial-explode' },
+            { in: 'pixelate-in', out: 'initial-pixelate' },
+            { in: 'glitch-in', out: 'initial-glitch' }
         ];
 
-        // Initialize slideshow
+        // Initialize slideshow with loading spinner
         function createSlideshow() {
             photoFiles.forEach((photo, index) => {
                 const slide = document.createElement('img');
                 slide.className = 'slide';
                 slide.src = photo;
                 slide.alt = `RiverAdams photo ${index + 1}`;
-                slide.onerror = () => slide.style.display = 'none';
+                
+                slide.onload = () => {
+                    loadedImages++;
+                    if (loadedImages === totalImages) {
+                        spinner.style.display = 'none';
+                        startSlideshow();
+                    }
+                };
+                
+                slide.onerror = () => {
+                    slide.style.display = 'none';
+                    loadedImages++;
+                    if (loadedImages === totalImages) {
+                        spinner.style.display = 'none';
+                        if (document.querySelectorAll('.slide:not([style*="display: none"])').length > 0) {
+                            startSlideshow();
+                        }
+                    }
+                };
+                
                 slideshow.appendChild(slide);
             });
-            startSlideshow();
+            
+            // If no images load at all
+            if (photoFiles.length === 0) {
+                spinner.style.display = 'none';
+            }
         }
 
-        // Start slideshow transitions
+        // Start slideshow with crazy transitions
         function startSlideshow() {
             const slides = document.querySelectorAll('.slide:not([style*="display: none"])');
             if (slides.length === 0) return;
@@ -364,7 +484,41 @@
                 
                 void slides[currentSlide].offsetWidth; // Force reflow
                 slides[currentSlide].className = `slide ${transition.in}`;
-            }, 6000);
+            }, 3000); // Faster transitions for more dynamism
+        }
+
+        // Animate game character
+        function animateCharacter(duration) {
+            gameCharacter.style.display = 'block';
+            gameCharacter.style.left = '-50px';
+            
+            const screenWidth = window.innerWidth;
+            const moveDistance = screenWidth + 100;
+            const moveDuration = duration * 1000; // Convert to milliseconds
+            
+            // Reset any existing animation
+            if (characterAnimation) {
+                clearInterval(characterAnimation);
+            }
+            
+            const startTime = Date.now();
+            const endTime = startTime + moveDuration;
+            
+            characterAnimation = setInterval(() => {
+                const now = Date.now();
+                const progress = (now - startTime) / moveDuration;
+                
+                if (progress >= 1) {
+                    gameCharacter.style.left = `${screenWidth + 50}px`;
+                    clearInterval(characterAnimation);
+                    setTimeout(() => {
+                        gameCharacter.style.display = 'none';
+                    }, 1000);
+                } else {
+                    const currentPos = -50 + (moveDistance * progress);
+                    gameCharacter.style.left = `${currentPos}px`;
+                }
+            }, 16); // ~60fps
         }
 
         // Initialize carousel
@@ -381,21 +535,36 @@
                 trackElement.addEventListener('click', async () => {
                     try {
                         if (currentPlayingTrack === index) {
-                            if (currentAudio.paused) await currentAudio.play();
-                            else currentAudio.pause();
+                            if (currentAudio.paused) {
+                                await currentAudio.play();
+                                animateCharacter(track.duration);
+                            } else {
+                                currentAudio.pause();
+                                clearInterval(characterAnimation);
+                                gameCharacter.style.display = 'none';
+                            }
                             return;
                         }
                         
                         if (currentAudio) currentAudio.pause();
+                        clearInterval(characterAnimation);
+                        gameCharacter.style.display = 'none';
                         
                         currentAudio = new Audio(track.file);
                         currentPlayingTrack = index;
-                        await currentAudio.play();
+                        
+                        currentAudio.onplay = () => {
+                            animateCharacter(track.duration);
+                        };
                         
                         currentAudio.onended = () => {
                             document.querySelector('.track.playing')?.classList.remove('playing');
                             currentPlayingTrack = null;
+                            clearInterval(characterAnimation);
+                            gameCharacter.style.display = 'none';
                         };
+                        
+                        await currentAudio.play();
                         
                         document.querySelector('.track.playing')?.classList.remove('playing');
                         trackElement.classList.add('playing');
@@ -432,6 +601,17 @@
         // Cleanup
         window.addEventListener('beforeunload', () => {
             if (slideInterval) clearInterval(slideInterval);
+            if (characterAnimation) clearInterval(characterAnimation);
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (characterAnimation && currentAudio && !currentAudio.paused) {
+                clearInterval(characterAnimation);
+                const currentTime = currentAudio.currentTime;
+                const remainingTime = audioFiles[currentPlayingTrack].duration - currentTime;
+                animateCharacter(remainingTime);
+            }
         });
     </script>
 </body>
