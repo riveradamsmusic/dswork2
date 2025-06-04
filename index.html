@@ -13,6 +13,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
         
         /* Base Styles */
         body {
@@ -80,6 +82,8 @@
         .font-marker { font-family: 'Permanent Marker', cursive; }
         .font-vt323 { font-family: 'VT323', monospace; }
         .font-major-mono { font-family: 'Major Mono Display', monospace; }
+        .font-bungee { font-family: 'Bungee', cursive; }
+        .font-monoton { font-family: 'Monoton', cursive; }
         
         /* Animations */
         @keyframes text-glitch {
@@ -339,8 +343,8 @@
         /* Floating Image */
         #floatingImage {
             position: absolute;
-            width: 40px; /* Changed from 60px to 40px */
-            height: 40px; /* Changed from 60px to 40px */
+            width: 40px;
+            height: 40px;
             object-fit: cover;
             z-index: 20;
             display: none;
@@ -427,8 +431,8 @@
             }
             
             #floatingImage {
-                width: 40px; /* Adjusted for mobile */
-                height: 40px; /* Adjusted for mobile */
+                width: 40px;
+                height: 40px;
             }
         }
     </style>
@@ -516,12 +520,12 @@
         const audioFiles = [
             { name: "21 Century", file: "RIVERADAMS/21_Century_copy.mp3", duration: 180 },
             { name: "Grey", file: "RIVERADAMS/grey_copy.mp3", duration: 210 },
-            { name: "Mr. Solo", file: "RIVERADAMS/Mr_Solo_copy.mp3", duration: 195 },
+            { name: "Mr. Solo", file: "RIVERADAMS/Mr_Solo_copy.mp3", duration: 195, font: 'font-monoton' },
             { name: "Opportunities", file: "RIVERADAMS/Opportunities_copy.mp3", duration: 225 },
             { name: "Rap (feat. AFEEGO)", file: "RIVERADAMS/Rap_feat_AFEEGO_copy.mp3", duration: 240 },
             { name: "Spoken Word", file: "RIVERADAMS/Spoken_Word_copy.mp3", duration: 180 },
             { name: "Trying", file: "RIVERADAMS/Trying_copy.mp3", duration: 200 },
-            { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3", duration: 190 }
+            { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3", duration: 190, font: 'font-bungee' }
         ];
 
         const photoFiles = Array.from({length: 11}, (_, i) => `RIVERADAMSPICZ/${i+1}.jpg`);
@@ -744,7 +748,7 @@
         function initCarousel() {
             audioFiles.forEach((track, index) => {
                 const trackElement = document.createElement('div');
-                trackElement.className = `track track-${index % 8}`;
+                trackElement.className = `track track-${index % 8} ${track.font || ''}`;
                 trackElement.textContent = track.name;
                 trackElement.dataset.index = index;
                 carousel.appendChild(trackElement);
