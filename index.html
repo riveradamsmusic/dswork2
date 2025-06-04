@@ -338,20 +338,17 @@
         
 	    /* Floating Image - Updated with higher z-index */
 		#floatingImage {
-		    border: 2px solid #D2B48C; /* Tan border */
-		    border-radius: 50%; /* Perfect circle */
-		    box-shadow: 
-		        0 3px 6px rgba(0,0,0,0.16),
-		        inset 0 0 0 1px rgba(255,255,255,0.1); /* Inner glow */
-		    transition: all 0.1s ease-out;
+		    border: 2px solid #D2B48C;
+		    border-radius: 50%;
+		    box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+		    transition: transform 0.1s ease-out;
+		    /* Keep all your existing positioning styles */
 		}
 
 		#floatingImage.grabbing {
-		    border-color: #C19A6B; /* Darker tan when grabbed */
 		    transform: scale(0.95);
-		    box-shadow: 
-		        0 5px 10px rgba(0,0,0,0.2),
-		        inset 0 0 0 1px rgba(255,255,255,0.2);
+		    border-color: #C19A6B;
+		    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 		}
 
 	    /* [Keep the existing #floatingImage.grabbing rule] */
@@ -801,10 +798,12 @@
 		    floatingImage.style.top = `${currentY}px`;
 
 		    // Physics parameters
-		    const throwPower = 2.2; // Strong throws
-		    const friction = 0.98; // Smooth deceleration
-		    const bounceFactor = 0.7; // Bounce energy
-		    let activeTouchId = null; // For touch separation
+		    const throwPower = 2.5; // Increased throw strength
+		    const friction = 0.97; // Slightly more friction
+		    const bounceFactor = 0.75; // Bounce energy
+		    let activeTouchId = null;
+		    let lastMoveTime = 0;
+		    let lastPositions = [];
 
 		    function updateFloatingImage() {
 		        if (!isDragging) {
@@ -812,11 +811,15 @@
 		            velocityX *= friction;
 		            velocityY *= friction;
             
+		            // Stop if velocity is very small
+		            if (Math.abs(velocityX) < 0.1) velocityX = 0;
+		            if (Math.abs(velocityY) < 0.1) velocityY = 0;
+
 		            // Update position
 		            currentX += velocityX;
 		            currentY += velocityY;
 
-		            // Boundary checks with clean bounces
+		            // Boundary checks with bounces
 		            if (currentX < 0) {
 		                currentX = 0;
 		                velocityX *= -bounceFactor;
@@ -843,46 +846,43 @@
 		    floatingImage.addEventListener('mousedown', handleDragStart);
 		    document.addEventListener('mousemove', handleDragMove);
 		    document.addEventListener('mouseup', handleDragEnd);
-		    document.addEventListener('mouseleave', handleDragEnd);
 
-		    // Touch handlers (separate from scrub controls)
-		    floatingImage.addEventListener('touchstart', (e) => {
+		    // Touch handlers
+		    floatingImage.addEventListener('touchstart', handleTouchStart, { passive: false });
+		    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+		    document.addEventListener('touchend', handleTouchEnd);
+
+		    function handleTouchStart(e) {
 		        if (!progressTrack.contains(e.target)) {
 		            activeTouchId = e.changedTouches[0].identifier;
 		            handleDragStart({
 		                clientX: e.changedTouches[0].clientX,
-		                clientY: e.changedTouches[0].clientY
+		                clientY: e.changedTouches[0].clientY,
+		                preventDefault: () => e.preventDefault()
 		            });
-		            e.preventDefault();
 		        }
-		    }, { passive: false });
+		    }
 
-		    document.addEventListener('touchmove', (e) => {
+		    function handleTouchMove(e) {
 		        if (activeTouchId === null) return;
-        
-		        const touch = Array.from(e.changedTouches).find(
-		            t => t.identifier === activeTouchId
-		        );
+		        const touch = Array.from(e.changedTouches).find(t => t.identifier === activeTouchId);
 		        if (touch) {
 		            handleDragMove({
 		                clientX: touch.clientX,
-		                clientY: touch.clientY
+		                clientY: touch.clientY,
+		                preventDefault: () => e.preventDefault()
 		            });
-		            e.preventDefault();
 		        }
-		    }, { passive: false });
+		    }
 
-		    document.addEventListener('touchend', (e) => {
+		    function handleTouchEnd(e) {
 		        if (activeTouchId === null) return;
-        
-		        const touch = Array.from(e.changedTouches).find(
-		            t => t.identifier === activeTouchId
-		        );
+		        const touch = Array.from(e.changedTouches).find(t => t.identifier === activeTouchId);
 		        if (touch) {
 		            handleDragEnd();
 		            activeTouchId = null;
 		        }
-		    });
+		    }
 
 		    function handleDragStart(e) {
 		        isDragging = true;
@@ -891,22 +891,45 @@
 		        lastY = e.clientY;
 		        velocityX = 0;
 		        velocityY = 0;
+		        lastMoveTime = Date.now();
+		        lastPositions = [];
 		        floatingImage.style.zIndex = '100';
+		        if (e.preventDefault) e.preventDefault();
 		    }
 
 		    function handleDragMove(e) {
 		        if (!isDragging) return;
         
-		        const dx = e.clientX - lastX;
-		        const dy = e.clientY - lastY;
+		        const now = Date.now();
+		        const timeDiff = now - lastMoveTime;
         
-		        currentX += dx;
-		        currentY += dy;
-		        floatingImage.style.left = `${currentX}px`;
-		        floatingImage.style.top = `${currentY}px`;
+		        if (timeDiff > 0) { // Only track if time has passed
+		            const dx = e.clientX - lastX;
+		            const dy = e.clientY - lastY;
+            
+		            currentX += dx;
+		            currentY += dy;
+		            floatingImage.style.left = `${currentX}px`;
+		            floatingImage.style.top = `${currentY}px`;
+            
+		            // Store recent positions for velocity calculation
+		            lastPositions.push({
+		                x: e.clientX,
+		                y: e.clientY,
+		                time: now
+		            });
+            
+		            // Keep only the last 5 positions
+		            if (lastPositions.length > 5) {
+		                lastPositions.shift();
+		            }
+            
+		            lastX = e.clientX;
+		            lastY = e.clientY;
+		            lastMoveTime = now;
+		        }
         
-		        lastX = e.clientX;
-		        lastY = e.clientY;
+		        if (e.preventDefault) e.preventDefault();
 		    }
 
 		    function handleDragEnd() {
@@ -916,11 +939,17 @@
 		        floatingImage.classList.remove('grabbing');
 		        floatingImage.style.zIndex = '20';
         
-		        // Calculate throw velocity
-		        const dx = lastX - (currentX - parseFloat(floatingImage.style.left));
-		        const dy = lastY - (currentY - parseFloat(floatingImage.style.top));
-		        velocityX = dx * throwPower * 0.3;
-		        velocityY = dy * throwPower * 0.3;
+		        // Calculate velocity based on recent movement
+		        if (lastPositions.length >= 2) {
+		            const first = lastPositions[0];
+		            const last = lastPositions[lastPositions.length - 1];
+		            const timeDiff = (last.time - first.time) || 1;
+            
+		            velocityX = (last.x - first.x) / timeDiff * throwPower * 16;
+		            velocityY = (last.y - first.y) / timeDiff * throwPower * 16;
+		        }
+        
+		        lastPositions = [];
 		    }
 
 		    updateFloatingImage();
