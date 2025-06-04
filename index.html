@@ -342,22 +342,23 @@
 		    width: 60px;
 		    height: 60px;
 		    object-fit: cover;
-		    border-radius: 12px; /* More rounded corners */
-		    border: 2px solid #87CEEB; /* Sky blue border */
-		    box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3); /* Subtle glow */
 		    z-index: 20;
 		    display: none;
 		    cursor: grab;
 		    user-select: none;
 		    touch-action: none;
-		    transition: all 0.2s ease; /* Smooth transitions */
+    
+		    /* REPLACE/ADD these properties: */
+		    border-radius: 50%; /* Perfect circle */
+		    box-shadow: 0 3px 6px rgba(0,0,0,0.16); /* Subtle shadow */
+		    transition: transform 0.1s ease-out; /* Smooth scale effect */
+		    border: none; /* Remove if you previously had a border */
 		}
-		
+
 		#floatingImage.grabbing {
+		    transform: scale(0.92); /* Slight "pressed" effect */
+		    box-shadow: 0 5px 10px rgba(0,0,0,0.2); /* Deeper shadow when grabbed */
 		    cursor: grabbing;
-		    border-color: #4682B4; /* Darker blue when active */
-		    box-shadow: 0 4px 12px rgba(70, 130, 180, 0.5);
-		    transform: scale(0.98); /* Slight "pressed" effect */
 		}
 
 	    /* [Keep the existing #floatingImage.grabbing rule] */
@@ -806,26 +807,22 @@
 		    floatingImage.style.left = `${currentX}px`;
 		    floatingImage.style.top = `${currentY}px`;
 
-		    // New physics parameters
-		    const throwSensitivity = 0.5; // Lower = slower throws (0.1-1.0)
-		    const friction = 0.92; // Increased from 0.98 for faster slowdown
-		    const minVelocity = 0.2; // Minimum speed before stopping
+		    // Physics parameters
+		    const throwPower = 2.2; // Increased velocity
+		    const friction = 0.98; // Smooth deceleration
+		    const bounceFactor = 0.7; // Energy retained on bounce
 
 		    function updateFloatingImage() {
 		        if (!isDragging) {
-		            currentX += velocityX;
-		            currentY += velocityY;
-            
-		            // Apply friction
+		            // Apply friction (organic slowdown)
 		            velocityX *= friction;
 		            velocityY *= friction;
             
-		            // Stop if velocity is very low
-		            if (Math.abs(velocityX) < minVelocity) velocityX = 0;
-		            if (Math.abs(velocityY) < minVelocity) velocityY = 0;
+		            // Update position
+		            currentX += velocityX;
+		            currentY += velocityY;
 
-		            // Boundary checks with bounce
-		            const bounceFactor = 0.7;
+		            // Boundary checks with clean bounces
 		            if (currentX < 0) {
 		                currentX = 0;
 		                velocityX *= -bounceFactor;
@@ -848,7 +845,9 @@
 		        animationFrameId = requestAnimationFrame(updateFloatingImage);
 		    }
 
-		    // Touch/Mouse event handlers
+		    // Track initial throw direction
+		    let throwVector = { x: 0, y: 0 };
+
 		    floatingImage.addEventListener('mousedown', handleDragStart);
 		    floatingImage.addEventListener('touchstart', handleDragStart, { passive: false });
 
@@ -857,26 +856,19 @@
 
 		    document.addEventListener('mouseup', handleDragEnd);
 		    document.addEventListener('touchend', handleDragEnd);
-		    document.addEventListener('mouseleave', handleDragEnd);
-
-		    let dragStartTime, dragStartX, dragStartY;
 
 		    function handleDragStart(e) {
 		        isDragging = true;
 		        floatingImage.classList.add('grabbing');
+		        throwVector = { x: 0, y: 0 };
         
 		        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
 		        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
         
 		        if (clientX && clientY) {
-		            lastX = dragStartX = clientX;
-		            lastY = dragStartY = clientY;
-		            dragStartTime = Date.now();
+		            lastX = clientX;
+		            lastY = clientY;
 		        }
-        
-		        velocityX = 0;
-		        velocityY = 0;
-		        floatingImage.style.zIndex = '100';
         
 		        if (e.cancelable) e.preventDefault();
 		    }
@@ -889,11 +881,12 @@
         
 		        if (!clientX || !clientY) return;
         
-		        const dx = clientX - lastX;
-		        const dy = clientY - lastY;
+		        // Track movement vector
+		        throwVector.x = clientX - lastX;
+		        throwVector.y = clientY - lastY;
         
-		        currentX += dx;
-		        currentY += dy;
+		        currentX += throwVector.x;
+		        currentY += throwVector.y;
 		        floatingImage.style.left = `${currentX}px`;
 		        floatingImage.style.top = `${currentY}px`;
         
@@ -908,31 +901,17 @@
         
 		        isDragging = false;
 		        floatingImage.classList.remove('grabbing');
-		        floatingImage.style.zIndex = '20';
         
-		        // Calculate throw velocity based on swipe speed and direction
-		        if (lastX && lastY && dragStartX && dragStartY) {
-		            const dragDuration = Date.now() - dragStartTime;
-		            const dragDistanceX = lastX - dragStartX;
-		            const dragDistanceY = lastY - dragStartY;
-            
-		            // Only apply throw if there was significant movement
-		            if (dragDuration > 0 && (Math.abs(dragDistanceX) > 5 || Math.abs(dragDistanceY) > 5)) {
-		                // Calculate velocity based on distance and duration of drag
-		                velocityX = (dragDistanceX / dragDuration) * 1000 * throwSensitivity;
-		                velocityY = (dragDistanceY / dragDuration) * 1000 * throwSensitivity;
-                
-		                // Limit maximum speed
-		                const maxSpeed = 15;
-		                velocityX = Math.max(-maxSpeed, Math.min(maxSpeed, velocityX));
-		                velocityY = Math.max(-maxSpeed, Math.min(maxSpeed, velocityY));
-		            }
+		        // Apply pure linear velocity in throw direction
+		        if (Math.abs(throwVector.x) > 1 || Math.abs(throwVector.y) > 1) {
+		            velocityX = throwVector.x * throwPower * 0.3;
+		            velocityY = throwVector.y * throwPower * 0.3;
 		        }
 		    }
 
 		    updateFloatingImage();
 		}
-
+		
         // Event Listeners
         emojiWrapper.addEventListener('click', async () => {
             if (!audioContext) {
