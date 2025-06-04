@@ -701,19 +701,23 @@
 		function handleScrub(event) {
 		    if (!currentAudio) return;
     
+		    // Prevent scrub if touch is on floating image
+		    if (event.touches) {
+		        const floatingImageRect = floatingImage.getBoundingClientRect();
+		        const touchX = event.touches[0].clientX;
+		        const touchY = event.touches[0].clientY;
+        
+		        if (touchX >= floatingImageRect.left && 
+		            touchX <= floatingImageRect.right &&
+		            touchY >= floatingImageRect.top &&
+		            touchY <= floatingImageRect.bottom) {
+		            return;
+		        }
+		    }
+    
 		    const progressTrackRect = progressTrack.getBoundingClientRect();
 		    let clientX = event.clientX || (event.touches && event.touches[0] ? event.touches[0].clientX : null);
 		    if (clientX === null) return;
-
-		    // Prevent scrub if touch is on floating image
-		    const floatingImageRect = floatingImage.getBoundingClientRect();
-		    if (event.touches && 
-		        clientX >= floatingImageRect.left && 
-		        clientX <= floatingImageRect.right &&
-		        event.touches[0].clientY >= floatingImageRect.top &&
-		        event.touches[0].clientY <= floatingImageRect.bottom) {
-		        return;
-		    }
 
 		    let scrubPosition = (clientX - progressTrackRect.left) / progressTrackRect.width;
 		    scrubPosition = Math.max(0, Math.min(1, scrubPosition));
@@ -725,6 +729,9 @@
 		    const startPosition = screenWidth <= 600 ? 15 : 25;
 		    const newPosition = startPosition + (scrubPosition * 50);
 		    gameCharacter.style.left = `${newPosition}%`;
+    
+		    // Ensure floating image stays visible
+		    floatingImage.style.display = 'block';
 		}
 
         // Character Animation
@@ -826,6 +833,7 @@
         }
         
         // Floating Image Functions
+
 		function initFloatingImage() {
 		    floatingImage.style.display = 'block';
 		    currentX = Math.random() * (window.innerWidth - floatingImage.offsetWidth);
@@ -833,12 +841,13 @@
 		    floatingImage.style.left = `${currentX}px`;
 		    floatingImage.style.top = `${currentY}px`;
 
-		    // Physics parameters
-		    const throwPower = 2.2;
-		    const friction = 0.96; // Slightly increased friction
-		    const bounceFactor = 0.7;
-		    const pixelationThreshold = 0.5; // Velocity threshold for pixelation
+		    // Updated physics parameters - higher velocity, more friction
+		    const throwPower = 4.5; // Increased from 2.2
+		    const friction = 0.92; // Increased friction from 0.96
+		    const bounceFactor = 0.75; // Slightly more bouncy
+		    const pixelationThreshold = 0.3; // Lower threshold for quicker pixelation
 		    let pixelationTimeout = null;
+		    let isResting = false;
 
 		    function updateFloatingImage() {
 		        if (!isDragging) {
@@ -877,12 +886,18 @@
 		            if (pixelationTimeout) clearTimeout(pixelationTimeout);
             
 		            if (currentSpeed < pixelationThreshold) {
-		                // Set timeout to add pixelation after brief pause
-		                pixelationTimeout = setTimeout(() => {
-		                    floatingImage.classList.add('pixelated');
-		                }, 300);
+		                if (!isResting) {
+		                    // Set timeout to add pixelation after brief pause
+		                    pixelationTimeout = setTimeout(() => {
+		                        floatingImage.classList.add('pixelated');
+		                        isResting = true;
+		                    }, 200);
+		                }
 		            } else {
-		                floatingImage.classList.remove('pixelated');
+		                if (isResting) {
+		                    floatingImage.classList.remove('pixelated');
+		                    isResting = false;
+		                }
 		            }
 		        }
 		        animationFrameId = requestAnimationFrame(updateFloatingImage);
@@ -890,12 +905,11 @@
 
 		    // Track initial throw direction
 		    let throwVector = { x: 0, y: 0 };
+		    let lastMoveTime = 0;
 
-		    // Only attach event listeners to the floating image
 		    floatingImage.addEventListener('mousedown', handleDragStart);
 		    floatingImage.addEventListener('touchstart', handleDragStart, { passive: false });
 
-		    // Prevent document-wide listeners to avoid interference with scrubber
 		    floatingImage.addEventListener('mousemove', handleDragMove);
 		    floatingImage.addEventListener('touchmove', handleDragMove, { passive: false });
 
@@ -907,7 +921,9 @@
 		        isDragging = true;
 		        floatingImage.classList.add('grabbing');
 		        floatingImage.classList.remove('pixelated');
+		        isResting = false;
 		        throwVector = { x: 0, y: 0 };
+		        lastMoveTime = Date.now();
     
 		        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
 		        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
@@ -928,12 +944,17 @@
     
 		        if (!clientX || !clientY) return;
     
-		        // Track movement vector
-		        throwVector.x = clientX - lastX;
-		        throwVector.y = clientY - lastY;
+		        // Calculate time delta for velocity calculation
+		        const now = Date.now();
+		        const deltaTime = Math.max(1, now - lastMoveTime);
+		        lastMoveTime = now;
     
-		        currentX += throwVector.x;
-		        currentY += throwVector.y;
+		        // Track movement vector with time consideration
+		        throwVector.x = (clientX - lastX) / deltaTime * 16; // Normalized to ~60fps
+		        throwVector.y = (clientY - lastY) / deltaTime * 16;
+    
+		        currentX += (clientX - lastX);
+		        currentY += (clientY - lastY);
 		        floatingImage.style.left = `${currentX}px`;
 		        floatingImage.style.top = `${currentY}px`;
     
@@ -949,10 +970,10 @@
 		        isDragging = false;
 		        floatingImage.classList.remove('grabbing');
     
-		        // Apply velocity in throw direction
-		        if (Math.abs(throwVector.x) > 1 || Math.abs(throwVector.y) > 1) {
-		            velocityX = throwVector.x * throwPower * 0.3;
-		            velocityY = throwVector.y * throwPower * 0.3;
+		        // Apply velocity in throw direction with more power
+		        if (Math.abs(throwVector.x) > 0.1 || Math.abs(throwVector.y) > 0.1) {
+		            velocityX = throwVector.x * throwPower;
+		            velocityY = throwVector.y * throwPower;
 		        }
 		    }
 
