@@ -54,10 +54,10 @@
             transform: scale(0.8);
         }
         
-        /* Glitchy Text - FIXED CENTERING */
+        /* Glitchy Text */
         #text {
             position: fixed;
-            top: 50vh; /* Use viewport units for consistent centering */
+            top: 50vh;
             left: 50vw;
             transform: translate(-50%, -50%);
             font-size: 24px;
@@ -78,6 +78,115 @@
         .font-vt323 { font-family: 'VT323', monospace; }
         .font-major-mono { font-family: 'Major Mono Display', monospace; }
         
+        /* Enhanced Glitch Animations */
+        @keyframes text-glitch {
+            0%, 5%, 100% { 
+                transform: translate(-50%, -50%); 
+                opacity: 1;
+                text-shadow: none;
+            }
+            1% { 
+                transform: translate(calc(-50% - 15px), calc(-50% + 10px)) scale(1.3) rotate(5deg); 
+                opacity: 0.8;
+                text-shadow: 5px 5px 0 magenta, -5px -5px 0 cyan;
+            }
+            2% { 
+                transform: translate(calc(-50% + 12px), calc(-50% - 8px)) scale(0.7) rotate(-10deg); 
+                opacity: 0.6;
+                clip-path: polygon(0 0, 100% 0, 100% 60%, 0 60%);
+            }
+            3% { 
+                transform: translate(calc(-50% - 8px), calc(-50% + 15px)) skew(20deg) scale(1.2); 
+                opacity: 0.9;
+                color: cyan;
+            }
+            4% { 
+                transform: translate(calc(-50% + 5px), calc(-50% - 12px)) scale(0.8) rotate(15deg); 
+                opacity: 0.7;
+                color: magenta;
+                text-shadow: 3px 3px 5px black;
+            }
+        }
+
+        @keyframes glitch-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        @keyframes glitch-color-shift {
+            0%, 100% { color: white; }
+            25% { color: #ff00ff; }
+            50% { color: #00ffff; }
+            75% { color: #ffff00; }
+        }
+
+        @keyframes glitch-move {
+            0% { transform: translate(-50%, -50%); }
+            20% { transform: translate(calc(-50% - 10px), calc(-50% + 5px)); }
+            40% { transform: translate(calc(-50% + 8px), calc(-50% - 8px)); }
+            60% { transform: translate(calc(-50% - 5px), calc(-50% + 10px)); }
+            80% { transform: translate(calc(-50% + 10px), calc(-50% - 5px)); }
+        }
+
+        .intense-glitch {
+            animation: 
+                text-glitch 0.1s infinite,
+                glitch-blink 0.3s infinite,
+                glitch-color-shift 1s infinite,
+                glitch-move 2s infinite;
+        }
+
+        .glitch-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            pointer-events: none;
+        }
+
+        .glitch-layer::before,
+        .glitch-layer::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+        }
+
+        .glitch-layer::before {
+            animation: glitch-effect-1 2s infinite linear alternate-reverse;
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+            transform: translate(calc(-50% - 5px), calc(-50% - 5px));
+        }
+
+        .glitch-layer::after {
+            animation: glitch-effect-2 2s infinite linear alternate-reverse;
+            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+            transform: translate(calc(-50% + 5px), calc(-50% + 5px));
+        }
+
+        @keyframes glitch-effect-1 {
+            0% { transform: translate(calc(-50% - 5px), calc(-50% - 5px)); }
+            20% { transform: translate(calc(-50% - 8px), calc(-50% - 10px)); }
+            40% { transform: translate(calc(-50% - 2px), calc(-50% + 5px)); }
+            60% { transform: translate(calc(-50% + 5px), calc(-50% - 2px)); }
+            80% { transform: translate(calc(-50% - 10px), calc(-50% + 8px)); }
+            100% { transform: translate(calc(-50% + 3px), calc(-50% - 7px)); }
+        }
+
+        @keyframes glitch-effect-2 {
+            0% { transform: translate(calc(-50% + 5px), calc(-50% + 5px)); }
+            20% { transform: translate(calc(-50% + 10px), calc(-50% + 2px)); }
+            40% { transform: translate(calc(-50% - 5px), calc(-50% - 8px)); }
+            60% { transform: translate(calc(-50% + 2px), calc(-50% + 10px)); }
+            80% { transform: translate(calc(-50% - 8px), calc(-50% - 5px)); }
+            100% { transform: translate(calc(-50% + 7px), calc(-50% + 3px)); }
+        }
+        
+        /* Rest of the original styles remain unchanged */
         /* Standalone Centered Slideshow */
         .slideshow-container {
             position: fixed;
@@ -303,24 +412,6 @@
             100% { transform: translateY(0); }
         }
         
-        /* Enhanced Glitch Animation */
-        @keyframes text-glitch {
-            0%, 100% { transform: translate(-50%, -50%); }
-            10% { transform: translate(calc(-50% - 5px), calc(-50% + 5px)) scale(1.1); }
-            20% { transform: translate(calc(-50% + 5px), calc(-50% - 5px)) scale(0.9); }
-            30% { transform: translate(calc(-50% - 3px), calc(-50% + 3px)) skew(5deg); }
-            40% { transform: translate(calc(-50% + 3px), calc(-50% - 3px)) skew(-5deg); }
-            50% { transform: translate(calc(-50% - 2px), calc(-50% + 2px)) rotate(3deg); }
-            60% { transform: translate(calc(-50% + 2px), calc(-50% - 2px)) rotate(-3deg); }
-            70% { transform: translate(calc(-50% - 4px), calc(-50% + 4px)) scale(1.05); }
-            80% { transform: translate(calc(-50% + 4px), calc(-50% - 4px)) scale(0.95); }
-            90% { transform: translate(calc(-50% - 1px), calc(-50% + 1px)); }
-        }
-        
-        .glitch-effect {
-            animation: text-glitch 0.4s linear infinite;
-        }
-        
         /* Mobile */
         @media only screen and (max-width: 600px) {
             #emoji {
@@ -369,13 +460,13 @@
             .game-character {
                 width: 30px;
                 height: 30px;
-                left: 15%; /* Changed from 25% */
+                left: 15%;
             }
             .progress-track {
                 top: 35px;
                 height: 3px;
-                left: 15%; /* Changed from 25% */
-                width: 55%; /* Slightly reduced width to match new position */
+                left: 15%;
+                width: 55%;
             }
         }
     </style>
@@ -535,33 +626,61 @@
             }, 3000);
         }
 
-        // Enhanced text flash with glitch effect
+        // Enhanced text flash with more intense glitch effect
         function showGlitchText() {
             text.style.display = 'block';
             text.style.opacity = '1';
             
+            // Create additional glitch layers
+            const glitchLayer1 = document.createElement('div');
+            glitchLayer1.className = 'glitch-layer';
+            glitchLayer1.dataset.text = 'RiverAdam$';
+            text.parentNode.insertBefore(glitchLayer1, text.nextSibling);
+            
+            const glitchLayer2 = document.createElement('div');
+            glitchLayer2.className = 'glitch-layer';
+            glitchLayer2.dataset.text = 'RiverAdam$';
+            text.parentNode.insertBefore(glitchLayer2, text.nextSibling);
+            
             let flashCount = 0;
-            const maxFlashes = 12;
-            const flashInterval = 250;
+            const maxFlashes = 6; // Reduced from 12 to make it about half the time
+            const flashInterval = 100; // Faster interval for more chaos
             
             const flash = setInterval(() => {
-                // Random font change
-                const randomFont = fontClasses[Math.floor(Math.random() * fontClasses.length)];
-                text.className = `handwritten ${randomFont} glitch-effect`;
+                // Random effects with higher intensity
+                const effects = [
+                    'intense-glitch',
+                    'font-press-start glitch-effect',
+                    'font-major-mono glitch-effect'
+                ];
+                const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+                text.className = `handwritten ${randomEffect}`;
                 
-                // More intense color changes
-                if (Math.random() > 0.5) {
-                    text.style.color = `hsl(${Math.random() * 360}, ${70 + Math.random() * 30}%, ${50 + Math.random() * 30}%)`;
-                } else {
-                    text.style.color = 'white';
-                }
+                // More dramatic color changes
+                const colors = [
+                    '#ff00ff', // magenta
+                    '#00ffff', // cyan
+                    '#ffff00', // yellow
+                    '#ff00ff', // magenta
+                    '#00ff00', // green
+                    '#ff0000'  // red
+                ];
+                text.style.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Random scale
+                text.style.transform = `translate(-50%, -50%) scale(${0.8 + Math.random() * 0.6})`;
                 
                 flashCount++;
                 if (flashCount >= maxFlashes) {
                     clearInterval(flash);
                     text.className = 'handwritten font-caveat';
                     text.style.color = 'white';
+                    text.style.transform = 'translate(-50%, -50%)';
                     text.style.animation = 'none';
+                    
+                    // Remove glitch layers
+                    glitchLayer1.remove();
+                    glitchLayer2.remove();
                     
                     setTimeout(() => {
                         text.style.display = 'none';
@@ -570,7 +689,7 @@
                         platformLinks.style.display = 'flex';
                         createSlideshow();
                         initCarousel();
-                    }, 500);
+                    }, 300);
                 }
             }, flashInterval);
         }
