@@ -369,10 +369,13 @@
             .game-character {
                 width: 30px;
                 height: 30px;
+                left: 15%; /* Changed from 25% */
             }
             .progress-track {
                 top: 35px;
                 height: 3px;
+                left: 15%; /* Changed from 25% */
+                width: 55%; /* Slightly reduced width to match new position */
             }
         }
     </style>
@@ -578,7 +581,8 @@
                 const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
                 progressFill.style.width = `${progress}%`;
                 const screenWidth = window.innerWidth;
-                const newPosition = 25 + (progress * 0.5);
+                const startPosition = screenWidth <= 600 ? 15 : 25; // Mobile vs desktop
+                const newPosition = startPosition + (progress * 0.5);
                 gameCharacter.style.left = `${newPosition}%`;
             }
         }
@@ -595,7 +599,9 @@
             progressFill.style.width = `${scrubPosition * 100}%`;
             
             // Update character position
-            const newPosition = 25 + (scrubPosition * 50);
+            const screenWidth = window.innerWidth;
+            const startPosition = screenWidth <= 600 ? 15 : 25;
+            const newPosition = startPosition + (scrubPosition * 50);
             gameCharacter.style.left = `${newPosition}%`;
         }
 
@@ -603,7 +609,7 @@
         function animateCharacter(duration) {
             gameCharacter.style.display = 'block';
             progressTrack.style.display = 'block';
-            gameCharacter.style.left = '25%';
+            gameCharacter.style.left = window.innerWidth <= 600 ? '15%' : '25%'; // Mobile vs desktop
             progressFill.style.width = '0%';
             
             // Start progress update interval
@@ -711,7 +717,8 @@
             if (currentAudio && !currentAudio.paused) {
                 // Update character position based on current progress
                 const progress = (currentAudio.currentTime / currentAudio.duration) * 50;
-                gameCharacter.style.left = `${25 + progress}%`;
+                const startPosition = window.innerWidth <= 600 ? 15 : 25;
+                gameCharacter.style.left = `${startPosition + progress}%`;
             }
         });
     </script>
