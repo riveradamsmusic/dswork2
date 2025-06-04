@@ -190,11 +190,10 @@
         /* Floating Bouncing Image */
         #floatingImage {
             position: absolute;
-            width: 90px; /* Same size as original top-right-image */
-            height: 90px; /* Same size as original top-right-image */
+            width: 60px; /* Smaller width */
+            height: 60px; /* Smaller height */
             object-fit: cover;
             border-radius: 4px;
-            border: 2px solid white; /* Thin white border */
             z-index: 0; /* Behind everything */
             display: none; /* Hidden initially */
             cursor: grab;
@@ -488,8 +487,8 @@
                 width: 55%;
             }
             #floatingImage {
-                width: 70px; /* Adjust size for mobile */
-                height: 70px; /* Adjust size for mobile */
+                width: 60px; /* Adjust size for mobile */
+                height: 60px; /* Adjust size for mobile */
             }
         }
     </style>
@@ -562,14 +561,14 @@
         let progressUpdateInterval = null;
 
         // Floating image variables
-        let vx = 2; // Initial horizontal velocity (pixels per frame)
-        let vy = 2; // Initial vertical velocity (pixels per frame)
-        let animationFrameId;
         let lastX = 0;
         let lastY = 0;
-        let isFlicking = false;
-        let flickerStartTime;
-        let flickVelocityMultiplier = 8; // Adjust for stronger flick
+        let currentX = 0;
+        let currentY = 0;
+        let velocityX = 0;
+        let velocityY = 0;
+        let friction = 0.98; // Adjust for faster/slower deceleration
+        let animationFrameId;
 
         // Audio files
         const audioFiles = [
@@ -586,16 +585,13 @@
         // Photo files
         const photoFiles = [];
         for (let i = 1; i <= 11; i++) {
-            // Ensure 1.jpg is NOT in the slideshow array if it's meant to float separately
-            // For now, keeping it here for the slideshow, but the floating one is distinct.
-            // If you truly want to exclude 1.jpg from the slideshow, modify this loop.
             photoFiles.push(`RIVERADAMSPICZ/${i}.jpg`);
         }
         totalImages = photoFiles.length;
 
         // Font classes for glitch effect
         const fontClasses = [
-            'font-caveat', 
+            'font-caveat',  
             'font-press-start',
             'font-rubik',
             'font-comic',
@@ -737,7 +733,7 @@
                 progressFill.style.width = `${progress}%`;
                 const screenWidth = window.innerWidth;
                 const startPosition = screenWidth <= 600 ? 15 : 25; // Mobile vs desktop
-                const newPosition = startPosition + (progress * 0.5);
+                const newPosition = startPosition + (progress * 0.5); // Adjust multiplier as needed
                 gameCharacter.style.left = `${newPosition}%`;
             }
         }
@@ -747,7 +743,10 @@
             if (!currentAudio) return;
             
             const progressTrackRect = progressTrack.getBoundingClientRect();
-            let scrubPosition = (event.clientX - progressTrackRect.left) / progressTrackRect.width;
+            let clientX = event.clientX || (event.touches && event.touches[0] ? event.touches[0].clientX : null);
+            if (clientX === null) return;
+
+            let scrubPosition = (clientX - progressTrackRect.left) / progressTrackRect.width;
             scrubPosition = Math.max(0, Math.min(1, scrubPosition));
             
             currentAudio.currentTime = scrubPosition * currentAudio.duration;
@@ -770,8 +769,8 @@
             // Start progress update interval
             progressUpdateInterval = setInterval(updateProgressBar, 100);
             
-            // Add event listeners for scrubbing
-            gameCharacter.addEventListener('mousedown', () => {
+            // Add event listeners for scrubbing (mouse & touch)
+            gameCharacter.addEventListener('mousedown', (e) => {
                 isDragging = true;
                 document.addEventListener('mousemove', handleScrub);
                 document.addEventListener('mouseup', () => {
@@ -779,10 +778,25 @@
                     document.removeEventListener('mousemove', handleScrub);
                 });
             });
+
+            gameCharacter.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                document.addEventListener('touchmove', handleScrub);
+                document.addEventListener('touchend', () => {
+                    isDragging = false;
+                    document.removeEventListener('touchmove', handleScrub);
+                });
+                e.preventDefault(); // Prevent scrolling while scrubbing
+            });
             
             progressTrack.addEventListener('click', (e) => {
                 handleScrub(e);
             });
+
+            progressTrack.addEventListener('touchstart', (e) => {
+                handleScrub(e);
+                e.preventDefault(); // Prevent scrolling
+            }, { passive: false }); // Use { passive: false } for preventDefault on touchstart/touchmove
         }
 
         // Clean up character animation
@@ -791,6 +805,7 @@
             progressTrack.style.display = 'none';
             gameCharacter.style.display = 'none';
             document.removeEventListener('mousemove', handleScrub);
+            document.removeEventListener('touchmove', handleScrub); // Remove touch listener too
             isDragging = false;
         }
 
@@ -855,168 +870,136 @@
             emoji.classList.add('fade-out');
             
             setTimeout(() => {
-                emojiWrapper.style.display = 'none';
-                showGlitchText();
-            }, 300);
+                emojiWrapper.style.display = 'none'; // Hide the emoji wrapper
+                showGlitchText(); // Proceed to show glitch text
+            }, 500); // Give a brief moment for the fade-out effect
         });
 
-        // Floating Image Logic
-        function updateFloatingImagePosition() {
-            let currentLeft = parseFloat(floatingImage.style.left) || 0;
-            let currentTop = parseFloat(floatingImage.style.top) || 0;
-
-            let newLeft = currentLeft + vx;
-            let newTop = currentTop + vy;
-
-            const imgWidth = floatingImage.offsetWidth;
-            const imgHeight = floatingImage.offsetHeight;
-            const maxX = window.innerWidth - imgWidth;
-            const maxY = window.innerHeight - imgHeight;
-
-            // Boundary collision
-            if (newLeft < 0 || newLeft > maxX) {
-                vx *= -1; // Reverse horizontal direction
-                newLeft = Math.max(0, Math.min(newLeft, maxX)); // Keep within bounds
-            }
-            if (newTop < 0 || newTop > maxY) {
-                vy *= -1; // Reverse vertical direction
-                newTop = Math.max(0, Math.min(newTop, maxY)); // Keep within bounds
-            }
-
-            floatingImage.style.left = `${newLeft}px`;
-            floatingImage.style.top = `${newTop}px`;
-
-            animationFrameId = requestAnimationFrame(updateFloatingImagePosition);
-        }
-
+        // Floating Image Initialization
         function initFloatingImage() {
             floatingImage.style.display = 'block';
             // Set initial random position
-            floatingImage.style.left = `${Math.random() * (window.innerWidth - floatingImage.offsetWidth)}px`;
-            floatingImage.style.top = `${Math.random() * (window.innerHeight - floatingImage.offsetHeight)}px`;
-            
-            // Start the bouncing animation
-            animationFrameId = requestAnimationFrame(updateFloatingImagePosition);
+            currentX = Math.random() * (window.innerWidth - floatingImage.offsetWidth);
+            currentY = Math.random() * (window.innerHeight - floatingImage.offsetHeight);
+            floatingImage.style.left = `${currentX}px`;
+            floatingImage.style.top = `${currentY}px`;
 
-            // Flicking functionality
-            let isDraggingFloating = false;
-            let startX, startY;
-            let currentX, currentY;
-            let startTime;
+            function updateFloatingImage() {
+                if (!isDragging) {
+                    currentX += velocityX;
+                    currentY += velocityY;
+                    velocityX *= friction;
+                    velocityY *= friction;
 
+                    // Stop if velocity is very low
+                    if (Math.abs(velocityX) < 0.1 && Math.abs(velocityY) < 0.1) {
+                        velocityX = 0;
+                        velocityY = 0;
+                    }
+
+                    // Boundary checks with energy loss (optional, for a more pronounced stop at edges)
+                    const bounceFactor = 0.6; // How much velocity is retained after a bounce
+                    if (currentX < 0) {
+                        currentX = 0;
+                        velocityX *= -bounceFactor;
+                    } else if (currentX > window.innerWidth - floatingImage.offsetWidth) {
+                        currentX = window.innerWidth - floatingImage.offsetWidth;
+                        velocityX *= -bounceFactor;
+                    }
+
+                    if (currentY < 0) {
+                        currentY = 0;
+                        velocityY *= -bounceFactor;
+                    } else if (currentY > window.innerHeight - floatingImage.offsetHeight) {
+                        currentY = window.innerHeight - floatingImage.offsetHeight;
+                        velocityY *= -bounceFactor;
+                    }
+
+                    floatingImage.style.left = `${currentX}px`;
+                    floatingImage.style.top = `${currentY}px`;
+                }
+                animationFrameId = requestAnimationFrame(updateFloatingImage);
+            }
+
+            // Mouse events
             floatingImage.addEventListener('mousedown', (e) => {
-                isDraggingFloating = true;
+                isDragging = true;
                 floatingImage.classList.add('grabbing');
-                startX = e.clientX;
-                startY = e.clientY;
-                currentX = startX;
-                currentY = startY;
-                startTime = performance.now(); // For flick detection
-
-                // Stop current animation to allow dragging
-                cancelAnimationFrame(animationFrameId);
-                
-                // Temporarily disable pointer-events on other elements to avoid interference during drag
-                carousel.style.pointerEvents = 'none';
-                platformLinks.style.pointerEvents = 'none';
-                slideshow.style.pointerEvents = 'none';
-                topRightImages.style.pointerEvents = 'none';
-                gameCharacter.style.pointerEvents = 'none';
-                progressTrack.style.pointerEvents = 'none';
-
-                // Prevent default drag behavior
-                e.preventDefault();
+                lastX = e.clientX;
+                lastY = e.clientY;
+                velocityX = 0; // Reset velocity on start drag
+                velocityY = 0;
+                e.preventDefault(); // Prevent default browser drag behavior
             });
+
+            // Touch events
+            floatingImage.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) { // Only handle single touch
+                    isDragging = true;
+                    floatingImage.classList.add('grabbing');
+                    lastX = e.touches[0].clientX;
+                    lastY = e.touches[0].clientY;
+                    velocityX = 0; // Reset velocity on start drag
+                    velocityY = 0;
+                }
+                e.preventDefault(); // Prevent scrolling when touching the image
+            }, { passive: false }); // Use { passive: false } for preventDefault on touchstart/touchmove
+
+            // Common move handler for both mouse and touch
+            const handleMove = (clientX, clientY) => {
+                if (!isDragging) return;
+                const dx = clientX - lastX;
+                const dy = clientY - lastY;
+                currentX += dx;
+                currentY += dy;
+                floatingImage.style.left = `${currentX}px`;
+                floatingImage.style.top = `${currentY}px`;
+                lastX = clientX;
+                lastY = clientY;
+            };
 
             document.addEventListener('mousemove', (e) => {
-                if (!isDraggingFloating) return;
-
-                const dx = e.clientX - currentX;
-                const dy = e.clientY - currentY;
-                
-                let newLeft = parseFloat(floatingImage.style.left) + dx;
-                let newTop = parseFloat(floatingImage.style.top) + dy;
-
-                // Clamp to window boundaries
-                newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - floatingImage.offsetWidth));
-                newTop = Math.max(0, Math.min(newTop, window.innerHeight - floatingImage.offsetHeight));
-
-                floatingImage.style.left = `${newLeft}px`;
-                floatingImage.style.top = `${newTop}px`;
-
-                currentX = e.clientX;
-                currentY = e.clientY;
+                handleMove(e.clientX, e.clientY);
             });
+
+            document.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1) {
+                    handleMove(e.touches[0].clientX, e.touches[0].clientY);
+                }
+                e.preventDefault(); // Prevent scrolling while dragging
+            }, { passive: false });
+
+            // Common end handler for both mouse and touch
+            const handleEnd = (clientX, clientY) => {
+                if (!isDragging) return;
+                isDragging = false;
+                floatingImage.classList.remove('grabbing');
+                // Calculate final velocity based on last movement before release
+                velocityX = clientX - lastX;
+                velocityY = clientY - lastY;
+            };
 
             document.addEventListener('mouseup', (e) => {
-                if (!isDraggingFloating) return;
-                isDraggingFloating = false;
-                floatingImage.classList.remove('grabbing');
-
-                // Re-enable pointer-events
-                carousel.style.pointerEvents = 'auto';
-                platformLinks.style.pointerEvents = 'auto';
-                slideshow.style.pointerEvents = 'auto';
-                topRightImages.style.pointerEvents = 'auto';
-                gameCharacter.style.pointerEvents = 'auto';
-                progressTrack.style.pointerEvents = 'auto';
-
-                const endTime = performance.now();
-                const deltaTime = endTime - startTime;
-
-                // Calculate flick velocity
-                const dragDistanceX = e.clientX - startX;
-                const dragDistanceY = e.clientY - startY;
-
-                // Only consider it a flick if moved quickly
-                if (deltaTime < 200 && (Math.abs(dragDistanceX) > 10 || Math.abs(dragDistanceY) > 10)) {
-                    vx = (dragDistanceX / deltaTime) * flickVelocityMultiplier; // Apply multiplier
-                    vy = (dragDistanceY / deltaTime) * flickVelocityMultiplier; // Apply multiplier
-                } else {
-                    // If not a flick, reset to a gentle bounce or previous velocity
-                    // For simplicity, let's just use the current dx/dy as the new velocity
-                    // or revert to a default if dx/dy are too small
-                    if (Math.abs(vx) < 2 && Math.abs(vy) < 2) {
-                         vx = (Math.random() < 0.5 ? 1 : -1) * 2;
-                         vy = (Math.random() < 0.5 ? 1 : -1) * 2;
-                    }
-                }
-                
-                // Resume animation with new velocity
-                animationFrameId = requestAnimationFrame(updateFloatingImagePosition);
+                handleEnd(e.clientX, e.clientY);
             });
+
+            document.addEventListener('touchend', (e) => {
+                // For touchend, if no touches remain, it means the finger was lifted.
+                // The lastX/lastY from touchmove already represent the last position.
+                // We don't have clientX/Y directly on touchend, so we use the last recorded.
+                handleEnd(lastX, lastY); 
+            });
+
+            // If the user drags off the window and releases, make sure it stops dragging
+            document.addEventListener('mouseleave', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    floatingImage.classList.remove('grabbing');
+                }
+            });
+
+            updateFloatingImage(); // Start the animation loop
         }
-
-        // Cleanup
-        window.addEventListener('beforeunload', () => {
-            if (slideInterval) clearInterval(slideInterval);
-            if (characterAnimation) clearInterval(characterAnimation);
-            if (progressUpdateInterval) clearInterval(progressUpdateInterval);
-            if (animationFrameId) cancelAnimationFrame(animationFrameId); // Stop floating image animation
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (currentAudio && !currentAudio.paused) {
-                // Update character position based on current progress
-                const progress = (currentAudio.currentTime / currentAudio.duration) * 50;
-                const startPosition = window.innerWidth <= 600 ? 15 : 25;
-                gameCharacter.style.left = `${startPosition + progress}%`;
-            }
-            // Ensure floating image stays within bounds on resize
-            if (floatingImage.style.display === 'block') {
-                let currentLeft = parseFloat(floatingImage.style.left) || 0;
-                let currentTop = parseFloat(floatingImage.style.top) || 0;
-
-                const imgWidth = floatingImage.offsetWidth;
-                const imgHeight = floatingImage.offsetHeight;
-                const maxX = window.innerWidth - imgWidth;
-                const maxY = window.innerHeight - imgHeight;
-
-                floatingImage.style.left = `${Math.max(0, Math.min(currentLeft, maxX))}px`;
-                floatingImage.style.top = `${Math.max(0, Math.min(currentTop, maxY))}px`;
-            }
-        });
     </script>
 </body>
 </html>
