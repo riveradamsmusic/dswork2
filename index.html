@@ -54,18 +54,19 @@
             transform: scale(0.8);
         }
         
-        /* Glitchy Text - UPDATED */
+        /* Glitchy Text - FIXED CENTERING */
         #text {
             position: fixed;
-            top: 50%;
-            left: 50%;
+            top: 50vh; /* Use viewport units for consistent centering */
+            left: 50vw;
             transform: translate(-50%, -50%);
-            font-size: 24px; /* Reduced from 48px */
+            font-size: 24px;
             display: none;
             opacity: 0;
             z-index: 5;
             text-align: center;
-            width: 100%;
+            width: auto;
+            pointer-events: none;
         }
         
         /* Font classes for glitch effect */
@@ -93,7 +94,7 @@
             display: none;
         }
         
-        /* Top Right Images - UPDATED (2.jpg on top of 1.jpg) */
+        /* Top Right Images - 2.jpg on top of 1.jpg */
         .top-right-images {
             position: fixed;
             top: 20px;
@@ -193,7 +194,7 @@
         .track-6 { font-family: 'Rubik Doodle Shadow', cursive; top: 130px; left: 234px; }
         .track-7 { font-family: 'Comic Neue', cursive; top: 65px; left: 195px; }
         
-        /* Slide transitions - SIMPLIFIED */
+        /* Slide transitions */
         .slide {
             position: absolute;
             width: 100%;
@@ -258,7 +259,7 @@
         .platform-emoji.spotify { color: #e0e0e0; }
         .platform-emoji.instagram { color: #e8e8e8; }
 
-        /* Wasteland Wanderer */
+        /* Wasteland Wanderer - UPDATED FOR SCRUBBING */
         .game-character {
             position: fixed;
             top: 20px;
@@ -271,6 +272,29 @@
             z-index: 100;
             display: none;
             animation: walk 0.5s steps(2) infinite;
+            cursor: ew-resize;
+        }
+        
+        /* Progress bar track */
+        .progress-track {
+            position: fixed;
+            top: 40px;
+            left: 25%;
+            width: 50%;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            z-index: 99;
+            display: none;
+        }
+        
+        /* Progress bar fill */
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: #9b59b6;
         }
         
         @keyframes walk {
@@ -281,16 +305,16 @@
         
         /* Enhanced Glitch Animation */
         @keyframes text-glitch {
-            0%, 100% { transform: translate(0); }
-            10% { transform: translate(-5px, 5px) scale(1.1); }
-            20% { transform: translate(5px, -5px) scale(0.9); }
-            30% { transform: translate(-3px, 3px) skew(5deg); }
-            40% { transform: translate(3px, -3px) skew(-5deg); }
-            50% { transform: translate(-2px, 2px) rotate(3deg); }
-            60% { transform: translate(2px, -2px) rotate(-3deg); }
-            70% { transform: translate(-4px, 4px) scale(1.05); }
-            80% { transform: translate(4px, -4px) scale(0.95); }
-            90% { transform: translate(-1px, 1px); }
+            0%, 100% { transform: translate(-50%, -50%); }
+            10% { transform: translate(calc(-50% - 5px), calc(-50% + 5px)) scale(1.1); }
+            20% { transform: translate(calc(-50% + 5px), calc(-50% - 5px)) scale(0.9); }
+            30% { transform: translate(calc(-50% - 3px), calc(-50% + 3px)) skew(5deg); }
+            40% { transform: translate(calc(-50% + 3px), calc(-50% - 3px)) skew(-5deg); }
+            50% { transform: translate(calc(-50% - 2px), calc(-50% + 2px)) rotate(3deg); }
+            60% { transform: translate(calc(-50% + 2px), calc(-50% - 2px)) rotate(-3deg); }
+            70% { transform: translate(calc(-50% - 4px), calc(-50% + 4px)) scale(1.05); }
+            80% { transform: translate(calc(-50% + 4px), calc(-50% - 4px)) scale(0.95); }
+            90% { transform: translate(calc(-50% - 1px), calc(-50% + 1px)); }
         }
         
         .glitch-effect {
@@ -305,7 +329,7 @@
                 height: 100px;
             }
             #text {
-                font-size: 32px; /* Reduced from 64px */
+                font-size: 32px;
             }
             .carousel-container {
                 width: 300px;
@@ -346,6 +370,10 @@
                 width: 30px;
                 height: 30px;
             }
+            .progress-track {
+                top: 35px;
+                height: 3px;
+            }
         }
     </style>
 </head>
@@ -364,7 +392,7 @@
             <div class="spinner"></div>
         </div>
         
-        <!-- Top Right Images - REVERSED ORDER (2.jpg on top of 1.jpg) -->
+        <!-- Top Right Images - 2.jpg on top of 1.jpg -->
         <div class="top-right-images" id="topRightImages">
             <img src="RIVERADAMSME/2.jpg" class="top-right-image" alt="RiverAdams 2">
             <img src="RIVERADAMSME/1.jpg" class="top-right-image" alt="RiverAdams 1">
@@ -372,6 +400,11 @@
         
         <!-- Offset Carousel -->
         <div class="carousel-container" id="carousel"></div>
+        
+        <!-- Progress bar for scrubbing -->
+        <div class="progress-track" id="progressTrack">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
         
         <!-- Wasteland Wanderer Character -->
         <div class="game-character" id="gameCharacter"></div>
@@ -402,6 +435,8 @@
         const topRightImages = document.getElementById('topRightImages');
         const platformLinks = document.getElementById('platformLinks');
         const gameCharacter = document.getElementById('gameCharacter');
+        const progressTrack = document.getElementById('progressTrack');
+        const progressFill = document.getElementById('progressFill');
         const spinner = document.querySelector('.spinner');
         
         let currentAudio = null;
@@ -412,6 +447,8 @@
         let characterAnimation = null;
         let loadedImages = 0;
         let totalImages = 0;
+        let isDragging = false;
+        let progressUpdateInterval = null;
 
         // Audio files
         const audioFiles = [
@@ -425,7 +462,7 @@
             { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3", duration: 190 }
         ];
 
-        // Photo files - now only 1-11.jpg
+        // Photo files
         const photoFiles = [];
         for (let i = 1; i <= 11; i++) {
             photoFiles.push(`RIVERADAMSPICZ/${i}.jpg`);
@@ -501,8 +538,8 @@
             text.style.opacity = '1';
             
             let flashCount = 0;
-            const maxFlashes = 12; // Increased from 8
-            const flashInterval = 250; // Reduced from 300ms
+            const maxFlashes = 12;
+            const flashInterval = 250;
             
             const flash = setInterval(() => {
                 // Random font change
@@ -516,21 +553,17 @@
                     text.style.color = 'white';
                 }
                 
-                // Random scale changes for more glitch effect
-                text.style.transform = `translate(-50%, -50%) scale(${0.9 + Math.random() * 0.3})`;
-                
                 flashCount++;
                 if (flashCount >= maxFlashes) {
                     clearInterval(flash);
                     text.className = 'handwritten font-caveat';
                     text.style.color = 'white';
                     text.style.animation = 'none';
-                    text.style.transform = 'translate(-50%, -50%) scale(1)';
                     
                     setTimeout(() => {
                         text.style.display = 'none';
                         carousel.style.display = 'block';
-                        topRightImages.style.display = 'flex'; // Changed to flex
+                        topRightImages.style.display = 'flex';
                         platformLinks.style.display = 'flex';
                         createSlideshow();
                         initCarousel();
@@ -539,39 +572,65 @@
             }, flashInterval);
         }
 
-        // Animate game character
+        // Update progress bar
+        function updateProgressBar() {
+            if (currentAudio && !isDragging) {
+                const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+                progressFill.style.width = `${progress}%`;
+                const screenWidth = window.innerWidth;
+                const newPosition = 25 + (progress * 0.5);
+                gameCharacter.style.left = `${newPosition}%`;
+            }
+        }
+
+        // Handle scrubbing
+        function handleScrub(event) {
+            if (!currentAudio) return;
+            
+            const progressTrackRect = progressTrack.getBoundingClientRect();
+            let scrubPosition = (event.clientX - progressTrackRect.left) / progressTrackRect.width;
+            scrubPosition = Math.max(0, Math.min(1, scrubPosition));
+            
+            currentAudio.currentTime = scrubPosition * currentAudio.duration;
+            progressFill.style.width = `${scrubPosition * 100}%`;
+            
+            // Update character position
+            const newPosition = 25 + (scrubPosition * 50);
+            gameCharacter.style.left = `${newPosition}%`;
+        }
+
+        // Animate game character with scrubbing capability
         function animateCharacter(duration) {
             gameCharacter.style.display = 'block';
+            progressTrack.style.display = 'block';
             gameCharacter.style.left = '25%';
+            progressFill.style.width = '0%';
             
-            const screenWidth = window.innerWidth;
-            const startPosition = screenWidth * 0.25;
-            const endPosition = screenWidth * 0.75;
-            const moveDistance = endPosition - startPosition;
-            const moveDuration = duration * 1000;
+            // Start progress update interval
+            progressUpdateInterval = setInterval(updateProgressBar, 100);
             
-            if (characterAnimation) {
-                clearInterval(characterAnimation);
-            }
+            // Add event listeners for scrubbing
+            gameCharacter.addEventListener('mousedown', () => {
+                isDragging = true;
+                document.addEventListener('mousemove', handleScrub);
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', handleScrub);
+                });
+            });
             
-            const startTime = Date.now();
-            const endTime = startTime + moveDuration;
-            
-            characterAnimation = setInterval(() => {
-                const now = Date.now();
-                const progress = (now - startTime) / moveDuration;
-                
-                if (progress >= 1) {
-                    gameCharacter.style.left = `${endPosition}px`;
-                    clearInterval(characterAnimation);
-                    setTimeout(() => {
-                        gameCharacter.style.display = 'none';
-                    }, 1000);
-                } else {
-                    const currentPos = startPosition + (moveDistance * progress);
-                    gameCharacter.style.left = `${currentPos}px`;
-                }
-            }, 16);
+            progressTrack.addEventListener('click', (e) => {
+                handleScrub(e);
+            });
+        }
+
+        // Clean up character animation
+        function cleanupCharacterAnimation() {
+            clearInterval(progressUpdateInterval);
+            progressTrack.style.display = 'none';
+            gameCharacter.style.display = 'none';
+            document.removeEventListener('mousemove', handleScrub);
+            isDragging = false;
         }
 
         // Initialize carousel
@@ -591,15 +650,15 @@
                                 animateCharacter(track.duration);
                             } else {
                                 currentAudio.pause();
-                                clearInterval(characterAnimation);
-                                gameCharacter.style.display = 'none';
+                                cleanupCharacterAnimation();
                             }
                             return;
                         }
                         
-                        if (currentAudio) currentAudio.pause();
-                        clearInterval(characterAnimation);
-                        gameCharacter.style.display = 'none';
+                        if (currentAudio) {
+                            currentAudio.pause();
+                            cleanupCharacterAnimation();
+                        }
                         
                         currentAudio = new Audio(track.file);
                         currentPlayingTrack = index;
@@ -611,8 +670,7 @@
                         currentAudio.onended = () => {
                             document.querySelector('.track.playing')?.classList.remove('playing');
                             currentPlayingTrack = null;
-                            clearInterval(characterAnimation);
-                            gameCharacter.style.display = 'none';
+                            cleanupCharacterAnimation();
                         };
                         
                         await currentAudio.play();
@@ -645,15 +703,15 @@
         window.addEventListener('beforeunload', () => {
             if (slideInterval) clearInterval(slideInterval);
             if (characterAnimation) clearInterval(characterAnimation);
+            if (progressUpdateInterval) clearInterval(progressUpdateInterval);
         });
 
         // Handle window resize
         window.addEventListener('resize', () => {
-            if (characterAnimation && currentAudio && !currentAudio.paused) {
-                clearInterval(characterAnimation);
-                const currentTime = currentAudio.currentTime;
-                const remainingTime = audioFiles[currentPlayingTrack].duration - currentTime;
-                animateCharacter(remainingTime);
+            if (currentAudio && !currentAudio.paused) {
+                // Update character position based on current progress
+                const progress = (currentAudio.currentTime / currentAudio.duration) * 50;
+                gameCharacter.style.left = `${25 + progress}%`;
             }
         });
     </script>
