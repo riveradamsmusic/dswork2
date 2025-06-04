@@ -10,6 +10,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Rubik+Doodle+Shadow&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
         
         body {
             background: #000;
@@ -52,7 +54,7 @@
             transform: scale(0.8);
         }
         
-        /* Centered Text */
+        /* Glitchy Text */
         #text {
             position: fixed;
             top: 50%;
@@ -62,7 +64,17 @@
             display: none;
             opacity: 0;
             z-index: 5;
+            text-align: center;
         }
+        
+        /* Font classes for glitch effect */
+        .font-caveat { font-family: 'Caveat', cursive; }
+        .font-press-start { font-family: 'Press Start 2P', cursive; }
+        .font-rubik { font-family: 'Rubik Doodle Shadow', cursive; }
+        .font-comic { font-family: 'Comic Neue', cursive; }
+        .font-marker { font-family: 'Permanent Marker', cursive; }
+        .font-vt323 { font-family: 'VT323', monospace; }
+        .font-major-mono { font-family: 'Major Mono Display', monospace; }
         
         /* Standalone Centered Slideshow */
         .slideshow-container {
@@ -77,10 +89,10 @@
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             background-color: rgba(20, 20, 20, 0.3);
-            display: none; /* Initially hidden */
+            display: none;
         }
         
-        /* Top Right Images */
+        /* Top Right Images - UPDATED */
         .top-right-images {
             position: fixed;
             top: 20px;
@@ -95,8 +107,6 @@
             width: 100%;
             height: 50%;
             object-fit: cover;
-            border-radius: 4px;
-            margin-bottom: 5px;
         }
         
         /* 8-Bit Loading Bar */
@@ -193,7 +203,7 @@
             opacity: 1;
         }
         
-        /* Platform Links - CLOSER TOGETHER BUT SAME SIZE */
+        /* Platform Links */
         .platform-links {
             position: fixed;
             bottom: 30px;
@@ -201,7 +211,7 @@
             right: 0;
             display: none;
             justify-content: center;
-            gap: 15px; /* Reduced from 25px */
+            gap: 15px;
             z-index: 5;
         }
         
@@ -221,15 +231,15 @@
         }
         
         .platform-emoji {
-            font-size: 18px; /* Original size */
-            width: 24px; /* Original size */
-            height: 24px; /* Original size */
+            font-size: 18px;
+            width: 24px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: rgba(30,30,30,0.7);
             border-radius: 50%;
-            padding: 8px; /* Original size */
+            padding: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
         }
@@ -263,6 +273,19 @@
             0% { transform: translateY(0); }
             50% { transform: translateY(-5px); }
             100% { transform: translateY(0); }
+        }
+        
+        /* Glitch Animation */
+        @keyframes text-glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(3px, -3px); }
+        }
+        
+        .glitch-effect {
+            animation: text-glitch 0.4s linear infinite;
         }
         
         /* Mobile */
@@ -300,16 +323,15 @@
                 right: 15px;
                 top: 15px;
             }
-            /* Mobile platform links - closer but same size */
             .platform-links {
                 bottom: 25px;
-                gap: 12px; /* Reduced from 20px */
+                gap: 12px;
             }
             .platform-emoji {
-                font-size: 16px; /* Original mobile size */
-                width: 20px; /* Original mobile size */
-                height: 20px; /* Original mobile size */
-                padding: 6px; /* Original mobile size */
+                font-size: 16px;
+                width: 20px;
+                height: 20px;
+                padding: 6px;
             }
             .game-character {
                 width: 30px;
@@ -333,10 +355,10 @@
             <div class="spinner"></div>
         </div>
         
-        <!-- Top Right Images -->
+        <!-- Top Right Images - UPDATED ORDER -->
         <div class="top-right-images" id="topRightImages">
-            <img src="RIVERADAMSME/1.jpg" class="top-right-image" alt="RiverAdams 1">
             <img src="RIVERADAMSME/2.jpg" class="top-right-image" alt="RiverAdams 2">
+            <img src="RIVERADAMSME/1.jpg" class="top-right-image" alt="RiverAdams 1">
         </div>
         
         <!-- Offset Carousel -->
@@ -401,6 +423,17 @@
         }
         totalImages = photoFiles.length;
 
+        // Font classes for glitch effect
+        const fontClasses = [
+            'font-caveat', 
+            'font-press-start',
+            'font-rubik',
+            'font-comic',
+            'font-marker',
+            'font-vt323',
+            'font-major-mono'
+        ];
+
         // Initialize slideshow with loading spinner
         function createSlideshow() {
             spinner.style.display = 'block';
@@ -434,7 +467,6 @@
                 slideshow.appendChild(slide);
             });
             
-            // If no images load at all
             if (photoFiles.length === 0) {
                 spinner.style.display = 'none';
             }
@@ -451,21 +483,60 @@
                 slides[currentSlide].classList.remove('active');
                 currentSlide = (currentSlide + 1) % slides.length;
                 slides[currentSlide].classList.add('active');
-            }, 3000); // 3 seconds per slide
+            }, 3000);
+        }
+
+        // Enhanced text flash with glitch effect
+        function showGlitchText() {
+            text.style.display = 'block';
+            text.style.opacity = '1';
+            
+            let flashCount = 0;
+            const maxFlashes = 8;
+            const flashInterval = 300; // ms
+            
+            const flash = setInterval(() => {
+                // Random font change
+                const randomFont = fontClasses[Math.floor(Math.random() * fontClasses.length)];
+                text.className = `handwritten ${randomFont} glitch-effect`;
+                
+                // Random color sometimes
+                if (Math.random() > 0.7) {
+                    text.style.color = `hsl(${Math.random() * 360}, 80%, 70%)`;
+                } else {
+                    text.style.color = 'white';
+                }
+                
+                flashCount++;
+                if (flashCount >= maxFlashes) {
+                    clearInterval(flash);
+                    text.className = 'handwritten font-caveat';
+                    text.style.color = 'white';
+                    text.style.animation = 'none';
+                    
+                    setTimeout(() => {
+                        text.style.display = 'none';
+                        carousel.style.display = 'block';
+                        topRightImages.style.display = 'block';
+                        platformLinks.style.display = 'flex';
+                        createSlideshow();
+                        initCarousel();
+                    }, 500);
+                }
+            }, flashInterval);
         }
 
         // Animate game character
         function animateCharacter(duration) {
             gameCharacter.style.display = 'block';
-            gameCharacter.style.left = '25%'; // Start 25% from left
+            gameCharacter.style.left = '25%';
             
             const screenWidth = window.innerWidth;
             const startPosition = screenWidth * 0.25;
-            const endPosition = screenWidth * 0.75; // Ends 25% from right
+            const endPosition = screenWidth * 0.75;
             const moveDistance = endPosition - startPosition;
-            const moveDuration = duration * 1000; // Convert to milliseconds
+            const moveDuration = duration * 1000;
             
-            // Reset any existing animation
             if (characterAnimation) {
                 clearInterval(characterAnimation);
             }
@@ -487,7 +558,7 @@
                     const currentPos = startPosition + (moveDistance * progress);
                     gameCharacter.style.left = `${currentPos}px`;
                 }
-            }, 16); // ~60fps
+            }, 16);
         }
 
         // Initialize carousel
@@ -553,17 +624,7 @@
             
             setTimeout(() => {
                 emojiWrapper.style.display = 'none';
-                text.style.display = 'block';
-                text.classList.add('flash');
-                
-                setTimeout(() => {
-                    text.style.display = 'none';
-                    carousel.style.display = 'block';
-                    topRightImages.style.display = 'block';
-                    platformLinks.style.display = 'flex';
-                    createSlideshow();
-                    initCarousel();
-                }, 2500);
+                showGlitchText(); // Now uses the enhanced glitch effect
             }, 300);
         });
 
