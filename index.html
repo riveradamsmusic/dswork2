@@ -338,27 +338,20 @@
         
 	    /* Floating Image - Updated with higher z-index */
 		#floatingImage {
-		    position: absolute;
-		    width: 60px;
-		    height: 60px;
-		    object-fit: cover;
-		    z-index: 20;
-		    display: none;
-		    cursor: grab;
-		    user-select: none;
-		    touch-action: none;
-    
-		    /* REPLACE/ADD these properties: */
+		    border: 2px solid #D2B48C; /* Tan border */
 		    border-radius: 50%; /* Perfect circle */
-		    box-shadow: 0 3px 6px rgba(0,0,0,0.16); /* Subtle shadow */
-		    transition: transform 0.1s ease-out; /* Smooth scale effect */
-		    border: none; /* Remove if you previously had a border */
+		    box-shadow: 
+		        0 3px 6px rgba(0,0,0,0.16),
+		        inset 0 0 0 1px rgba(255,255,255,0.1); /* Inner glow */
+		    transition: all 0.1s ease-out;
 		}
 
 		#floatingImage.grabbing {
-		    transform: scale(0.92); /* Slight "pressed" effect */
-		    box-shadow: 0 5px 10px rgba(0,0,0,0.2); /* Deeper shadow when grabbed */
-		    cursor: grabbing;
+		    border-color: #C19A6B; /* Darker tan when grabbed */
+		    transform: scale(0.95);
+		    box-shadow: 
+		        0 5px 10px rgba(0,0,0,0.2),
+		        inset 0 0 0 1px rgba(255,255,255,0.2);
 		}
 
 	    /* [Keep the existing #floatingImage.grabbing rule] */
@@ -808,13 +801,14 @@
 		    floatingImage.style.top = `${currentY}px`;
 
 		    // Physics parameters
-		    const throwPower = 2.2; // Increased velocity
+		    const throwPower = 2.2; // Strong throws
 		    const friction = 0.98; // Smooth deceleration
-		    const bounceFactor = 0.7; // Energy retained on bounce
+		    const bounceFactor = 0.7; // Bounce energy
+		    let activeTouchId = null; // For touch separation
 
 		    function updateFloatingImage() {
 		        if (!isDragging) {
-		            // Apply friction (organic slowdown)
+		            // Apply friction
 		            velocityX *= friction;
 		            velocityY *= friction;
             
@@ -845,55 +839,74 @@
 		        animationFrameId = requestAnimationFrame(updateFloatingImage);
 		    }
 
-		    // Track initial throw direction
-		    let throwVector = { x: 0, y: 0 };
-
+		    // Mouse handlers
 		    floatingImage.addEventListener('mousedown', handleDragStart);
-		    floatingImage.addEventListener('touchstart', handleDragStart, { passive: false });
-
 		    document.addEventListener('mousemove', handleDragMove);
-		    document.addEventListener('touchmove', handleDragMove, { passive: false });
-
 		    document.addEventListener('mouseup', handleDragEnd);
-		    document.addEventListener('touchend', handleDragEnd);
+		    document.addEventListener('mouseleave', handleDragEnd);
+
+		    // Touch handlers (separate from scrub controls)
+		    floatingImage.addEventListener('touchstart', (e) => {
+		        if (!progressTrack.contains(e.target)) {
+		            activeTouchId = e.changedTouches[0].identifier;
+		            handleDragStart({
+		                clientX: e.changedTouches[0].clientX,
+		                clientY: e.changedTouches[0].clientY
+		            });
+		            e.preventDefault();
+		        }
+		    }, { passive: false });
+
+		    document.addEventListener('touchmove', (e) => {
+		        if (activeTouchId === null) return;
+        
+		        const touch = Array.from(e.changedTouches).find(
+		            t => t.identifier === activeTouchId
+		        );
+		        if (touch) {
+		            handleDragMove({
+		                clientX: touch.clientX,
+		                clientY: touch.clientY
+		            });
+		            e.preventDefault();
+		        }
+		    }, { passive: false });
+
+		    document.addEventListener('touchend', (e) => {
+		        if (activeTouchId === null) return;
+        
+		        const touch = Array.from(e.changedTouches).find(
+		            t => t.identifier === activeTouchId
+		        );
+		        if (touch) {
+		            handleDragEnd();
+		            activeTouchId = null;
+		        }
+		    });
 
 		    function handleDragStart(e) {
 		        isDragging = true;
 		        floatingImage.classList.add('grabbing');
-		        throwVector = { x: 0, y: 0 };
-        
-		        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-		        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-        
-		        if (clientX && clientY) {
-		            lastX = clientX;
-		            lastY = clientY;
-		        }
-        
-		        if (e.cancelable) e.preventDefault();
+		        lastX = e.clientX;
+		        lastY = e.clientY;
+		        velocityX = 0;
+		        velocityY = 0;
+		        floatingImage.style.zIndex = '100';
 		    }
 
 		    function handleDragMove(e) {
 		        if (!isDragging) return;
         
-		        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-		        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+		        const dx = e.clientX - lastX;
+		        const dy = e.clientY - lastY;
         
-		        if (!clientX || !clientY) return;
-        
-		        // Track movement vector
-		        throwVector.x = clientX - lastX;
-		        throwVector.y = clientY - lastY;
-        
-		        currentX += throwVector.x;
-		        currentY += throwVector.y;
+		        currentX += dx;
+		        currentY += dy;
 		        floatingImage.style.left = `${currentX}px`;
 		        floatingImage.style.top = `${currentY}px`;
         
-		        lastX = clientX;
-		        lastY = clientY;
-        
-		        if (e.cancelable) e.preventDefault();
+		        lastX = e.clientX;
+		        lastY = e.clientY;
 		    }
 
 		    function handleDragEnd() {
@@ -901,12 +914,13 @@
         
 		        isDragging = false;
 		        floatingImage.classList.remove('grabbing');
+		        floatingImage.style.zIndex = '20';
         
-		        // Apply pure linear velocity in throw direction
-		        if (Math.abs(throwVector.x) > 1 || Math.abs(throwVector.y) > 1) {
-		            velocityX = throwVector.x * throwPower * 0.3;
-		            velocityY = throwVector.y * throwPower * 0.3;
-		        }
+		        // Calculate throw velocity
+		        const dx = lastX - (currentX - parseFloat(floatingImage.style.left));
+		        const dy = lastY - (currentY - parseFloat(floatingImage.style.top));
+		        velocityX = dx * throwPower * 0.3;
+		        velocityY = dy * throwPower * 0.3;
 		    }
 
 		    updateFloatingImage();
