@@ -336,22 +336,32 @@
             100% { transform: translateY(0); }
         }
         
-        /* Floating Image */
-        #floatingImage {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 4px;
-            z-index: 0;
-            display: none;
-            cursor: grab;
-            user-select: none;
-        }
+	    /* Floating Image - Updated with higher z-index */
+	    #floatingImage {
+	        position: absolute;
+	        width: 60px;
+	        height: 60px;
+	        object-fit: cover;
+	        border-radius: 4px;
+	        z-index: 20; /* Changed from 0 to 20 */
+	        display: none;
+	        cursor: grab;
+	        user-select: none;
+	        touch-action: none; /* New line */
+	    }
 
-        #floatingImage.grabbing {
-            cursor: grabbing;
-        }
+	    /* [Keep the existing #floatingImage.grabbing rule] */
+
+	    /* Update these z-index values */
+	    .slideshow-container {
+	        z-index: 10; /* Added this line */
+	        /* [Keep all other existing slideshow-container styles] */
+	    }
+    
+	    .carousel-container {
+	        z-index: 15; /* Added this line */
+	        /* [Keep all other existing carousel-container styles] */
+	    }
         
         /* Mobile Responsive */
         @media only screen and (max-width: 600px) {
@@ -779,113 +789,110 @@
         }
         
         // Floating Image Functions
-        function initFloatingImage() {
-            floatingImage.style.display = 'block';
-            currentX = Math.random() * (window.innerWidth - floatingImage.offsetWidth);
-            currentY = Math.random() * (window.innerHeight - floatingImage.offsetHeight);
-            floatingImage.style.left = `${currentX}px`;
-            floatingImage.style.top = `${currentY}px`;
+		function initFloatingImage() {
+		    floatingImage.style.display = 'block';
+		    currentX = Math.random() * (window.innerWidth - floatingImage.offsetWidth);
+		    currentY = Math.random() * (window.innerHeight - floatingImage.offsetHeight);
+		    floatingImage.style.left = `${currentX}px`;
+		    floatingImage.style.top = `${currentY}px`;
 
-            function updateFloatingImage() {
-                if (!isDragging) {
-                    currentX += velocityX;
-                    currentY += velocityY;
-                    velocityX *= friction;
-                    velocityY *= friction;
+		    function updateFloatingImage() {
+		        if (!isDragging) {
+		            currentX += velocityX;
+		            currentY += velocityY;
+		            velocityX *= friction;
+		            velocityY *= friction;
 
-                    const bounceFactor = 0.6;
-                    if (currentX < 0) {
-                        currentX = 0;
-                        velocityX *= -bounceFactor;
-                    } else if (currentX > window.innerWidth - floatingImage.offsetWidth) {
-                        currentX = window.innerWidth - floatingImage.offsetWidth;
-                        velocityX *= -bounceFactor;
-                    }
+		            const bounceFactor = 0.6;
+		            if (currentX < 0) {
+		                currentX = 0;
+		                velocityX *= -bounceFactor;
+		            } else if (currentX > window.innerWidth - floatingImage.offsetWidth) {
+		                currentX = window.innerWidth - floatingImage.offsetWidth;
+		                velocityX *= -bounceFactor;
+		            }
 
-                    if (currentY < 0) {
-                        currentY = 0;
-                        velocityY *= -bounceFactor;
-                    } else if (currentY > window.innerHeight - floatingImage.offsetHeight) {
-                        currentY = window.innerHeight - floatingImage.offsetHeight;
-                        velocityY *= -bounceFactor;
-                    }
+		            if (currentY < 0) {
+		                currentY = 0;
+		                velocityY *= -bounceFactor;
+		            } else if (currentY > window.innerHeight - floatingImage.offsetHeight) {
+		                currentY = window.innerHeight - floatingImage.offsetHeight;
+		                velocityY *= -bounceFactor;
+		            }
 
-                    floatingImage.style.left = `${currentX}px`;
-                    floatingImage.style.top = `${currentY}px`;
-                }
-                animationFrameId = requestAnimationFrame(updateFloatingImage);
-            }
+		            floatingImage.style.left = `${currentX}px`;
+		            floatingImage.style.top = `${currentY}px`;
+		        }
+		        animationFrameId = requestAnimationFrame(updateFloatingImage);
+		    }
 
-            floatingImage.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                floatingImage.classList.add('grabbing');
-                lastX = e.clientX;
-                lastY = e.clientY;
-                velocityX = 0;
-                velocityY = 0;
-                e.preventDefault();
-            });
+		    // Improved touch event handling
+		    floatingImage.addEventListener('mousedown', handleDragStart);
+		    floatingImage.addEventListener('touchstart', handleDragStart, { passive: false });
 
-            floatingImage.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) {
-                    isDragging = true;
-                    floatingImage.classList.add('grabbing');
-                    lastX = e.touches[0].clientX;
-                    lastY = e.touches[0].clientY;
-                    velocityX = 0;
-                    velocityY = 0;
-                }
-                e.preventDefault();
-            }, { passive: false });
+		    document.addEventListener('mousemove', handleDragMove);
+		    document.addEventListener('touchmove', handleDragMove, { passive: false });
 
-            const handleMove = (clientX, clientY) => {
-                if (!isDragging) return;
-                const dx = clientX - lastX;
-                const dy = clientY - lastY;
-                currentX += dx;
-                currentY += dy;
-                floatingImage.style.left = `${currentX}px`;
-                floatingImage.style.top = `${currentY}px`;
-                lastX = clientX;
-                lastY = clientY;
-            };
+		    document.addEventListener('mouseup', handleDragEnd);
+		    document.addEventListener('touchend', handleDragEnd);
+		    document.addEventListener('mouseleave', handleDragEnd);
 
-            document.addEventListener('mousemove', (e) => {
-                handleMove(e.clientX, e.clientY);
-            });
+		    function handleDragStart(e) {
+		        isDragging = true;
+		        floatingImage.classList.add('grabbing');
+        
+		        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+		        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+        
+		        if (clientX && clientY) {
+		            lastX = clientX;
+		            lastY = clientY;
+		        }
+        
+		        velocityX = 0;
+		        velocityY = 0;
+		        floatingImage.style.zIndex = '100';
+        
+		        if (e.cancelable) e.preventDefault();
+		    }
 
-            document.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 1) {
-                    handleMove(e.touches[0].clientX, e.touches[0].clientY);
-                }
-                e.preventDefault();
-            }, { passive: false });
+		    function handleDragMove(e) {
+		        if (!isDragging) return;
+        
+		        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+		        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+        
+		        if (!clientX || !clientY) return;
+        
+		        const dx = clientX - lastX;
+		        const dy = clientY - lastY;
+        
+		        currentX += dx;
+		        currentY += dy;
+		        floatingImage.style.left = `${currentX}px`;
+		        floatingImage.style.top = `${currentY}px`;
+        
+		        lastX = clientX;
+		        lastY = clientY;
+        
+		        if (e.cancelable) e.preventDefault();
+		    }
 
-            const handleEnd = (clientX, clientY) => {
-                if (!isDragging) return;
-                isDragging = false;
-                floatingImage.classList.remove('grabbing');
-                velocityX = clientX - lastX;
-                velocityY = clientY - lastY;
-            };
+		    function handleDragEnd() {
+		        if (!isDragging) return;
+        
+		        isDragging = false;
+		        floatingImage.classList.remove('grabbing');
+		        floatingImage.style.zIndex = '20';
+        
+		        if (lastX && lastY) {
+		            velocityX = lastX - (currentX - parseFloat(floatingImage.style.left));
+		            velocityY = lastY - (currentY - parseFloat(floatingImage.style.top));
+		        }
+		    }
 
-            document.addEventListener('mouseup', (e) => {
-                handleEnd(e.clientX, e.clientY);
-            });
-
-            document.addEventListener('touchend', (e) => {
-                handleEnd(lastX, lastY); 
-            });
-
-            document.addEventListener('mouseleave', () => {
-                if (isDragging) {
-                    isDragging = false;
-                    floatingImage.classList.remove('grabbing');
-                }
-            });
-
-            updateFloatingImage();
-        }
+		    updateFloatingImage();
+		}
 
         // Event Listeners
         emojiWrapper.addEventListener('click', async () => {
