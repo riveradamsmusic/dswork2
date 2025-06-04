@@ -54,17 +54,18 @@
             transform: scale(0.8);
         }
         
-        /* Glitchy Text */
+        /* Glitchy Text - UPDATED */
         #text {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 48px;
+            font-size: 24px; /* Reduced from 48px */
             display: none;
             opacity: 0;
             z-index: 5;
             text-align: center;
+            width: 100%;
         }
         
         /* Font classes for glitch effect */
@@ -92,7 +93,7 @@
             display: none;
         }
         
-        /* Top Right Images - UPDATED */
+        /* Top Right Images - UPDATED (2.jpg on top of 1.jpg) */
         .top-right-images {
             position: fixed;
             top: 20px;
@@ -278,13 +279,18 @@
             100% { transform: translateY(0); }
         }
         
-        /* Glitch Animation */
+        /* Enhanced Glitch Animation */
         @keyframes text-glitch {
             0%, 100% { transform: translate(0); }
-            20% { transform: translate(-3px, 3px); }
-            40% { transform: translate(-3px, -3px); }
-            60% { transform: translate(3px, 3px); }
-            80% { transform: translate(3px, -3px); }
+            10% { transform: translate(-5px, 5px) scale(1.1); }
+            20% { transform: translate(5px, -5px) scale(0.9); }
+            30% { transform: translate(-3px, 3px) skew(5deg); }
+            40% { transform: translate(3px, -3px) skew(-5deg); }
+            50% { transform: translate(-2px, 2px) rotate(3deg); }
+            60% { transform: translate(2px, -2px) rotate(-3deg); }
+            70% { transform: translate(-4px, 4px) scale(1.05); }
+            80% { transform: translate(4px, -4px) scale(0.95); }
+            90% { transform: translate(-1px, 1px); }
         }
         
         .glitch-effect {
@@ -299,7 +305,7 @@
                 height: 100px;
             }
             #text {
-                font-size: 64px;
+                font-size: 32px; /* Reduced from 64px */
             }
             .carousel-container {
                 width: 300px;
@@ -358,10 +364,10 @@
             <div class="spinner"></div>
         </div>
         
-        <!-- Top Right Images - Explicit 1.jpg on top of 2.jpg -->
+        <!-- Top Right Images - REVERSED ORDER (2.jpg on top of 1.jpg) -->
         <div class="top-right-images" id="topRightImages">
-            <img src="RIVERADAMSME/1.jpg" class="top-right-image" alt="RiverAdams 1">
             <img src="RIVERADAMSME/2.jpg" class="top-right-image" alt="RiverAdams 2">
+            <img src="RIVERADAMSME/1.jpg" class="top-right-image" alt="RiverAdams 1">
         </div>
         
         <!-- Offset Carousel -->
@@ -421,10 +427,10 @@
 
         // Photo files - now only 1-11.jpg
         const photoFiles = [];
-        for (let i = 1; i <= 11; i++) {  // Changed from 12 to 11
+        for (let i = 1; i <= 11; i++) {
             photoFiles.push(`RIVERADAMSPICZ/${i}.jpg`);
         }
-        totalImages = photoFiles.length; // This will now be 11
+        totalImages = photoFiles.length;
 
         // Font classes for glitch effect
         const fontClasses = [
@@ -495,20 +501,23 @@
             text.style.opacity = '1';
             
             let flashCount = 0;
-            const maxFlashes = 8;
-            const flashInterval = 300; // ms
+            const maxFlashes = 12; // Increased from 8
+            const flashInterval = 250; // Reduced from 300ms
             
             const flash = setInterval(() => {
                 // Random font change
                 const randomFont = fontClasses[Math.floor(Math.random() * fontClasses.length)];
                 text.className = `handwritten ${randomFont} glitch-effect`;
                 
-                // Random color sometimes
-                if (Math.random() > 0.7) {
-                    text.style.color = `hsl(${Math.random() * 360}, 80%, 70%)`;
+                // More intense color changes
+                if (Math.random() > 0.5) {
+                    text.style.color = `hsl(${Math.random() * 360}, ${70 + Math.random() * 30}%, ${50 + Math.random() * 30}%)`;
                 } else {
                     text.style.color = 'white';
                 }
+                
+                // Random scale changes for more glitch effect
+                text.style.transform = `translate(-50%, -50%) scale(${0.9 + Math.random() * 0.3})`;
                 
                 flashCount++;
                 if (flashCount >= maxFlashes) {
@@ -516,11 +525,12 @@
                     text.className = 'handwritten font-caveat';
                     text.style.color = 'white';
                     text.style.animation = 'none';
+                    text.style.transform = 'translate(-50%, -50%) scale(1)';
                     
                     setTimeout(() => {
                         text.style.display = 'none';
                         carousel.style.display = 'block';
-                        topRightImages.style.display = 'block';
+                        topRightImages.style.display = 'flex'; // Changed to flex
                         platformLinks.style.display = 'flex';
                         createSlideshow();
                         initCarousel();
@@ -627,7 +637,7 @@
             
             setTimeout(() => {
                 emojiWrapper.style.display = 'none';
-                showGlitchText(); // Now uses the enhanced glitch effect
+                showGlitchText();
             }, 300);
         });
 
