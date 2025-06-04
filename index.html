@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RiverAdam$</title>
     <style>
+        /* Google Font Imports */
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Rubik+Doodle+Shadow&display=swap');
@@ -13,6 +14,7 @@
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
         
+        /* Base Styles */
         body {
             background: #000;
             height: 100vh;
@@ -20,7 +22,7 @@
             place-items: center;
             margin: 0;
             overflow: hidden;
-            position: relative; /* Needed for absolute positioning of floating image */
+            position: relative;
         }
         
         .handwritten {
@@ -30,7 +32,7 @@
             letter-spacing: 1px;
         }
         
-        /* Centered Emoji */
+        /* Emoji Wrapper */
         .emoji-wrapper {
             position: fixed;
             top: 50%;
@@ -55,7 +57,7 @@
             transform: scale(0.8);
         }
         
-        /* Glitchy Text */
+        /* Glitch Text */
         #text {
             position: fixed;
             top: 50vh;
@@ -70,7 +72,7 @@
             pointer-events: none;
         }
         
-        /* Font classes for glitch effect */
+        /* Font Classes */
         .font-caveat { font-family: 'Caveat', cursive; }
         .font-press-start { font-family: 'Press Start 2P', cursive; }
         .font-rubik { font-family: 'Rubik Doodle Shadow', cursive; }
@@ -79,34 +81,13 @@
         .font-vt323 { font-family: 'VT323', monospace; }
         .font-major-mono { font-family: 'Major Mono Display', monospace; }
         
-        /* Enhanced Glitch Animations */
+        /* Animations */
         @keyframes text-glitch {
-            0%, 5%, 100% { 
-                transform: translate(-50%, -50%); 
-                opacity: 1;
-                text-shadow: none;
-            }
-            1% { 
-                transform: translate(calc(-50% - 15px), calc(-50% + 10px)) scale(1.3) rotate(5deg); 
-                opacity: 0.8;
-                text-shadow: 5px 5px 0 magenta, -5px -5px 0 cyan;
-            }
-            2% { 
-                transform: translate(calc(-50% + 12px), calc(-50% - 8px)) scale(0.7) rotate(-10deg); 
-                opacity: 0.6;
-                clip-path: polygon(0 0, 100% 0, 100% 60%, 0 60%);
-            }
-            3% { 
-                transform: translate(calc(-50% - 8px), calc(-50% + 15px)) skew(20deg) scale(1.2); 
-                opacity: 0.9;
-                color: cyan;
-            }
-            4% { 
-                transform: translate(calc(-50% + 5px), calc(-50% - 12px)) scale(0.8) rotate(15deg); 
-                opacity: 0.7;
-                color: magenta;
-                text-shadow: 3px 3px 5px black;
-            }
+            0%, 5%, 100% { transform: translate(-50%, -50%); opacity: 1; text-shadow: none; }
+            1% { transform: translate(calc(-50% - 15px), calc(-50% + 10px)) scale(1.3) rotate(5deg); opacity: 0.8; text-shadow: 5px 5px 0 magenta, -5px -5px 0 cyan; }
+            2% { transform: translate(calc(-50% + 12px), calc(-50% - 8px)) scale(0.7) rotate(-10deg); opacity: 0.6; clip-path: polygon(0 0, 100% 0, 100% 60%, 0 60%); }
+            3% { transform: translate(calc(-50% - 8px), calc(-50% + 15px)) skew(20deg) scale(1.2); opacity: 0.9; color: cyan; }
+            4% { transform: translate(calc(-50% + 5px), calc(-50% - 12px)) scale(0.8) rotate(15deg); opacity: 0.7; color: magenta; text-shadow: 3px 3px 5px black; }
         }
 
         @keyframes glitch-blink {
@@ -137,75 +118,7 @@
                 glitch-move 2s infinite;
         }
 
-        .glitch-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            pointer-events: none;
-        }
-
-        .glitch-layer::before,
-        .glitch-layer::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-        }
-
-        .glitch-layer::before {
-            animation: glitch-effect-1 2s infinite linear alternate-reverse;
-            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-            transform: translate(calc(-50% - 5px), calc(-50% - 5px));
-        }
-
-        .glitch-layer::after {
-            animation: glitch-effect-2 2s infinite linear alternate-reverse;
-            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
-            transform: translate(calc(-50% + 5px), calc(-50% + 5px));
-        }
-
-        @keyframes glitch-effect-1 {
-            0% { transform: translate(calc(-50% - 5px), calc(-50% - 5px)); }
-            20% { transform: translate(calc(-50% - 8px), calc(-50% - 10px)); }
-            40% { transform: translate(calc(-50% - 2px), calc(-50% + 5px)); }
-            60% { transform: translate(calc(-50% + 5px), calc(-50% - 2px)); }
-            80% { transform: translate(calc(-50% - 10px), calc(-50% + 8px)); }
-            100% { transform: translate(calc(-50% + 3px), calc(-50% - 7px)); }
-        }
-
-        @keyframes glitch-effect-2 {
-            0% { transform: translate(calc(-50% + 5px), calc(-50% + 5px)); }
-            20% { transform: translate(calc(-50% + 10px), calc(-50% + 2px)); }
-            40% { transform: translate(calc(-50% - 5px), calc(-50% - 8px)); }
-            60% { transform: translate(calc(-50% + 2px), calc(-50% + 10px)); }
-            80% { transform: translate(calc(-50% - 8px), calc(-50% - 5px)); }
-            100% { transform: translate(calc(-50% + 7px), calc(-50% + 3px)); }
-        }
-        
-        /* Floating Bouncing Image */
-        #floatingImage {
-            position: absolute;
-            width: 60px; /* Smaller width */
-            height: 60px; /* Smaller height */
-            object-fit: cover;
-            border-radius: 4px;
-            z-index: 0; /* Behind everything */
-            display: none; /* Hidden initially */
-            cursor: grab;
-            user-select: none;
-        }
-
-        #floatingImage.grabbing {
-            cursor: grabbing;
-        }
-
-        /* Rest of the original styles remain unchanged */
-        /* Standalone Centered Slideshow */
+        /* Slideshow Styles */
         .slideshow-container {
             position: fixed;
             top: 50%;
@@ -221,13 +134,26 @@
             display: none;
         }
         
-        /* Top Right Images - only 2.jpg now */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        
+        .slide.active {
+            opacity: 1;
+        }
+        
+        /* Top Right Images */
         .top-right-images {
             position: fixed;
             top: 20px;
             right: 20px;
             width: 90px;
-            height: 90px; /* Adjusted height since only one image */
+            height: 90px;
             z-index: 1;
             display: none;
             flex-direction: column;
@@ -241,7 +167,7 @@
             border-radius: 4px;
         }
         
-        /* 8-Bit Loading Bar */
+        /* Loading Spinner */
         .spinner {
             position: absolute;
             top: 50%;
@@ -277,7 +203,7 @@
             100% { width: 100%; }
         }
         
-        /* Offset Carousel */
+        /* Carousel Styles */
         .carousel-container {
             display: none;
             position: fixed;
@@ -311,7 +237,7 @@
             color: #00ff00;
         }
         
-        /* Track positions */
+        /* Track Positions */
         .track-0 { font-family: 'Press Start 2P', cursive; top: 26px; left: 130px; }
         .track-1 { font-family: 'Rubik Doodle Shadow', cursive; top: 65px; left: 65px; }
         .track-2 { font-family: 'Comic Neue', cursive; top: 130px; left: 26px; }
@@ -320,20 +246,6 @@
         .track-5 { font-family: 'Press Start 2P', cursive; top: 221px; left: 195px; }
         .track-6 { font-family: 'Rubik Doodle Shadow', cursive; top: 130px; left: 234px; }
         .track-7 { font-family: 'Comic Neue', cursive; top: 65px; left: 195px; }
-        
-        /* Slide transitions */
-        .slide {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 1s ease;
-        }
-        
-        .slide.active {
-            opacity: 1;
-        }
         
         /* Platform Links */
         .platform-links {
@@ -381,12 +293,7 @@
             box-shadow: 0 3px 12px rgba(0,0,0,0.4);
         }
         
-        .platform-emoji.apple { color: #f8f8f8; }
-        .platform-emoji.youtube { color: #f0f0f0; }
-        .platform-emoji.spotify { color: #e0e0e0; }
-        .platform-emoji.instagram { color: #e8e8e8; }
-
-        /* Wasteland Wanderer - UPDATED FOR SCRUBBING */
+        /* Game Character */
         .game-character {
             position: fixed;
             top: 20px;
@@ -402,7 +309,7 @@
             cursor: ew-resize;
         }
         
-        /* Progress bar track */
+        /* Progress Bar */
         .progress-track {
             position: fixed;
             top: 40px;
@@ -414,7 +321,6 @@
             display: none;
         }
         
-        /* Progress bar fill */
         .progress-fill {
             position: absolute;
             top: 0;
@@ -430,23 +336,44 @@
             100% { transform: translateY(0); }
         }
         
-        /* Mobile */
+        /* Floating Image */
+        #floatingImage {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            z-index: 0;
+            display: none;
+            cursor: grab;
+            user-select: none;
+        }
+
+        #floatingImage.grabbing {
+            cursor: grabbing;
+        }
+        
+        /* Mobile Responsive */
         @media only screen and (max-width: 600px) {
             #emoji {
                 font-size: 100px;
                 width: 100px;
                 height: 100px;
             }
+            
             #text {
                 font-size: 32px;
             }
+            
             .carousel-container {
                 width: 300px;
                 height: 300px;
             }
+            
             .track {
                 font-size: 14px;
             }
+            
             .track-0 { top: 20px; left: 100px; }
             .track-1 { top: 50px; left: 50px; }
             .track-2 { top: 100px; left: 20px; }
@@ -455,40 +382,47 @@
             .track-5 { top: 170px; left: 150px; }
             .track-6 { top: 100px; left: 180px; }
             .track-7 { top: 50px; left: 150px; }
+            
             .slideshow-container {
                 width: 80px;
                 height: 80px;
             }
+            
             .top-right-images {
                 width: 80px;
-                height: 80px; /* Adjusted height for single image */
+                height: 80px;
                 right: 15px;
                 top: 15px;
             }
+            
             .platform-links {
                 bottom: 25px;
                 gap: 12px;
             }
+            
             .platform-emoji {
                 font-size: 16px;
                 width: 20px;
                 height: 20px;
                 padding: 6px;
             }
+            
             .game-character {
                 width: 30px;
                 height: 30px;
                 left: 15%;
             }
+            
             .progress-track {
                 top: 35px;
                 height: 3px;
                 left: 15%;
                 width: 55%;
             }
+            
             #floatingImage {
-                width: 60px; /* Adjust size for mobile */
-                height: 60px; /* Adjust size for mobile */
+                width: 60px;
+                height: 60px;
             }
         }
     </style>
@@ -536,6 +470,7 @@
     </div>
 
     <script>
+        // DOM Elements
         const emoji = document.getElementById('emoji');
         const emojiWrapper = document.querySelector('.emoji-wrapper');
         const text = document.getElementById('text');
@@ -549,28 +484,28 @@
         const spinner = document.querySelector('.spinner');
         const floatingImage = document.getElementById('floatingImage');
         
+        // State Variables
         let currentAudio = null;
         let currentPlayingTrack = null;
         let audioContext = null;
         let slideInterval = null;
         let currentSlide = 0;
-        let characterAnimation = null;
         let loadedImages = 0;
         let totalImages = 0;
         let isDragging = false;
         let progressUpdateInterval = null;
-
-        // Floating image variables
+        
+        // Floating Image Variables
         let lastX = 0;
         let lastY = 0;
         let currentX = 0;
         let currentY = 0;
         let velocityX = 0;
         let velocityY = 0;
-        let friction = 0.98; // Adjust for faster/slower deceleration
+        const friction = 0.98;
         let animationFrameId;
 
-        // Audio files
+        // Data
         const audioFiles = [
             { name: "21 Century", file: "RIVERADAMS/21_Century_copy.mp3", duration: 180 },
             { name: "Grey", file: "RIVERADAMS/grey_copy.mp3", duration: 210 },
@@ -582,14 +517,9 @@
             { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3", duration: 190 }
         ];
 
-        // Photo files
-        const photoFiles = [];
-        for (let i = 1; i <= 11; i++) {
-            photoFiles.push(`RIVERADAMSPICZ/${i}.jpg`);
-        }
+        const photoFiles = Array.from({length: 11}, (_, i) => `RIVERADAMSPICZ/${i+1}.jpg`);
         totalImages = photoFiles.length;
 
-        // Font classes for glitch effect
         const fontClasses = [
             'font-caveat',  
             'font-press-start',
@@ -600,16 +530,15 @@
             'font-major-mono'
         ];
 
-        // Initialize slideshow with loading spinner
+        // Initialize Slideshow
         function createSlideshow() {
             spinner.style.display = 'block';
             slideshow.style.display = 'block';
             
-            // Filter out 1.jpg if it's meant to be solely the floating one
-            const slidesToLoad = photoFiles.filter(file => !file.includes('1.jpg')); // Exclude 1.jpg here
-            totalImages = slidesToLoad.length; // Update total images for the spinner
+            const slidesToLoad = photoFiles.filter(file => !file.includes('1.jpg'));
+            totalImages = slidesToLoad.length;
 
-            if (totalImages === 0) { // Handle case if no images or only 1.jpg was left
+            if (totalImages === 0) {
                 spinner.style.display = 'none';
                 return;
             }
@@ -643,7 +572,6 @@
             });
         }
 
-        // Start slideshow with simple fade transition
         function startSlideshow() {
             const slides = document.querySelectorAll('#slideshow .slide:not([style*="display: none"])');
             if (slides.length === 0) return;
@@ -657,12 +585,11 @@
             }, 3000);
         }
 
-        // Enhanced text flash with more intense glitch effect
+        // Text Glitch Effect
         function showGlitchText() {
             text.style.display = 'block';
             text.style.opacity = '1';
             
-            // Create additional glitch layers
             const glitchLayer1 = document.createElement('div');
             glitchLayer1.className = 'glitch-layer';
             glitchLayer1.dataset.text = 'RiverAdam$';
@@ -674,11 +601,10 @@
             text.parentNode.insertBefore(glitchLayer2, text.nextSibling);
             
             let flashCount = 0;
-            const maxFlashes = 6; // Reduced from 12 to make it about half the time
-            const flashInterval = 100; // Faster interval for more chaos
+            const maxFlashes = 6;
+            const flashInterval = 100;
             
             const flash = setInterval(() => {
-                // Random effects with higher intensity
                 const effects = [
                     'intense-glitch',
                     'font-press-start glitch-effect',
@@ -687,18 +613,16 @@
                 const randomEffect = effects[Math.floor(Math.random() * effects.length)];
                 text.className = `handwritten ${randomEffect}`;
                 
-                // More dramatic color changes
                 const colors = [
-                    '#ff00ff', // magenta
-                    '#00ffff', // cyan
-                    '#ffff00', // yellow
-                    '#ff00ff', // magenta
-                    '#00ff00', // green
-                    '#ff0000'  // red
+                    '#ff00ff',
+                    '#00ffff',
+                    '#ffff00',
+                    '#ff00ff',
+                    '#00ff00',
+                    '#ff0000'
                 ];
                 text.style.color = colors[Math.floor(Math.random() * colors.length)];
                 
-                // Random scale
                 text.style.transform = `translate(-50%, -50%) scale(${0.8 + Math.random() * 0.6})`;
                 
                 flashCount++;
@@ -709,7 +633,6 @@
                     text.style.transform = 'translate(-50%, -50%)';
                     text.style.animation = 'none';
                     
-                    // Remove glitch layers
                     glitchLayer1.remove();
                     glitchLayer2.remove();
                     
@@ -720,25 +643,24 @@
                         platformLinks.style.display = 'flex';
                         createSlideshow();
                         initCarousel();
-                        initFloatingImage(); // Initialize floating image after glitch
+                        initFloatingImage();
                     }, 300);
                 }
             }, flashInterval);
         }
 
-        // Update progress bar
+        // Progress Bar Functions
         function updateProgressBar() {
             if (currentAudio && !isDragging) {
                 const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
                 progressFill.style.width = `${progress}%`;
                 const screenWidth = window.innerWidth;
-                const startPosition = screenWidth <= 600 ? 15 : 25; // Mobile vs desktop
-                const newPosition = startPosition + (progress * 0.5); // Adjust multiplier as needed
+                const startPosition = screenWidth <= 600 ? 15 : 25;
+                const newPosition = startPosition + (progress * 0.5);
                 gameCharacter.style.left = `${newPosition}%`;
             }
         }
 
-        // Handle scrubbing
         function handleScrub(event) {
             if (!currentAudio) return;
             
@@ -752,24 +674,21 @@
             currentAudio.currentTime = scrubPosition * currentAudio.duration;
             progressFill.style.width = `${scrubPosition * 100}%`;
             
-            // Update character position
             const screenWidth = window.innerWidth;
             const startPosition = screenWidth <= 600 ? 15 : 25;
             const newPosition = startPosition + (scrubPosition * 50);
             gameCharacter.style.left = `${newPosition}%`;
         }
 
-        // Animate game character with scrubbing capability
+        // Character Animation
         function animateCharacter(duration) {
             gameCharacter.style.display = 'block';
             progressTrack.style.display = 'block';
-            gameCharacter.style.left = window.innerWidth <= 600 ? '15%' : '25%'; // Mobile vs desktop
+            gameCharacter.style.left = window.innerWidth <= 600 ? '15%' : '25%';
             progressFill.style.width = '0%';
             
-            // Start progress update interval
             progressUpdateInterval = setInterval(updateProgressBar, 100);
             
-            // Add event listeners for scrubbing (mouse & touch)
             gameCharacter.addEventListener('mousedown', (e) => {
                 isDragging = true;
                 document.addEventListener('mousemove', handleScrub);
@@ -786,7 +705,7 @@
                     isDragging = false;
                     document.removeEventListener('touchmove', handleScrub);
                 });
-                e.preventDefault(); // Prevent scrolling while scrubbing
+                e.preventDefault();
             });
             
             progressTrack.addEventListener('click', (e) => {
@@ -795,21 +714,20 @@
 
             progressTrack.addEventListener('touchstart', (e) => {
                 handleScrub(e);
-                e.preventDefault(); // Prevent scrolling
-            }, { passive: false }); // Use { passive: false } for preventDefault on touchstart/touchmove
+                e.preventDefault();
+            }, { passive: false });
         }
 
-        // Clean up character animation
         function cleanupCharacterAnimation() {
             clearInterval(progressUpdateInterval);
             progressTrack.style.display = 'none';
             gameCharacter.style.display = 'none';
             document.removeEventListener('mousemove', handleScrub);
-            document.removeEventListener('touchmove', handleScrub); // Remove touch listener too
+            document.removeEventListener('touchmove', handleScrub);
             isDragging = false;
         }
 
-        // Initialize carousel
+        // Initialize Carousel
         function initCarousel() {
             audioFiles.forEach((track, index) => {
                 const trackElement = document.createElement('div');
@@ -860,25 +778,9 @@
             });
         }
         
-        // Emoji click handler
-        emojiWrapper.addEventListener('click', async () => {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                await audioContext.resume();
-            }
-            
-            emoji.classList.add('fade-out');
-            
-            setTimeout(() => {
-                emojiWrapper.style.display = 'none'; // Hide the emoji wrapper
-                showGlitchText(); // Proceed to show glitch text
-            }, 500); // Give a brief moment for the fade-out effect
-        });
-
-        // Floating Image Initialization
+        // Floating Image Functions
         function initFloatingImage() {
             floatingImage.style.display = 'block';
-            // Set initial random position
             currentX = Math.random() * (window.innerWidth - floatingImage.offsetWidth);
             currentY = Math.random() * (window.innerHeight - floatingImage.offsetHeight);
             floatingImage.style.left = `${currentX}px`;
@@ -891,14 +793,7 @@
                     velocityX *= friction;
                     velocityY *= friction;
 
-                    // Stop if velocity is very low
-                    if (Math.abs(velocityX) < 0.1 && Math.abs(velocityY) < 0.1) {
-                        velocityX = 0;
-                        velocityY = 0;
-                    }
-
-                    // Boundary checks with energy loss (optional, for a more pronounced stop at edges)
-                    const bounceFactor = 0.6; // How much velocity is retained after a bounce
+                    const bounceFactor = 0.6;
                     if (currentX < 0) {
                         currentX = 0;
                         velocityX *= -bounceFactor;
@@ -921,31 +816,28 @@
                 animationFrameId = requestAnimationFrame(updateFloatingImage);
             }
 
-            // Mouse events
             floatingImage.addEventListener('mousedown', (e) => {
                 isDragging = true;
                 floatingImage.classList.add('grabbing');
                 lastX = e.clientX;
                 lastY = e.clientY;
-                velocityX = 0; // Reset velocity on start drag
+                velocityX = 0;
                 velocityY = 0;
-                e.preventDefault(); // Prevent default browser drag behavior
+                e.preventDefault();
             });
 
-            // Touch events
             floatingImage.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) { // Only handle single touch
+                if (e.touches.length === 1) {
                     isDragging = true;
                     floatingImage.classList.add('grabbing');
                     lastX = e.touches[0].clientX;
                     lastY = e.touches[0].clientY;
-                    velocityX = 0; // Reset velocity on start drag
+                    velocityX = 0;
                     velocityY = 0;
                 }
-                e.preventDefault(); // Prevent scrolling when touching the image
-            }, { passive: false }); // Use { passive: false } for preventDefault on touchstart/touchmove
+                e.preventDefault();
+            }, { passive: false });
 
-            // Common move handler for both mouse and touch
             const handleMove = (clientX, clientY) => {
                 if (!isDragging) return;
                 const dx = clientX - lastX;
@@ -966,15 +858,13 @@
                 if (e.touches.length === 1) {
                     handleMove(e.touches[0].clientX, e.touches[0].clientY);
                 }
-                e.preventDefault(); // Prevent scrolling while dragging
+                e.preventDefault();
             }, { passive: false });
 
-            // Common end handler for both mouse and touch
             const handleEnd = (clientX, clientY) => {
                 if (!isDragging) return;
                 isDragging = false;
                 floatingImage.classList.remove('grabbing');
-                // Calculate final velocity based on last movement before release
                 velocityX = clientX - lastX;
                 velocityY = clientY - lastY;
             };
@@ -984,13 +874,9 @@
             });
 
             document.addEventListener('touchend', (e) => {
-                // For touchend, if no touches remain, it means the finger was lifted.
-                // The lastX/lastY from touchmove already represent the last position.
-                // We don't have clientX/Y directly on touchend, so we use the last recorded.
                 handleEnd(lastX, lastY); 
             });
 
-            // If the user drags off the window and releases, make sure it stops dragging
             document.addEventListener('mouseleave', () => {
                 if (isDragging) {
                     isDragging = false;
@@ -998,8 +884,23 @@
                 }
             });
 
-            updateFloatingImage(); // Start the animation loop
+            updateFloatingImage();
         }
+
+        // Event Listeners
+        emojiWrapper.addEventListener('click', async () => {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                await audioContext.resume();
+            }
+            
+            emoji.classList.add('fade-out');
+            
+            setTimeout(() => {
+                emojiWrapper.style.display = 'none';
+                showGlitchText();
+            }, 500);
+        });
     </script>
 </body>
 </html>
