@@ -101,12 +101,15 @@
             height: 180px;
             z-index: 1;
             display: none;
+            flex-direction: column;
+            gap: 10px;
         }
         
         .top-right-image {
             width: 100%;
-            height: 50%;
+            height: 80px;
             object-fit: cover;
+            border-radius: 4px;
         }
         
         /* 8-Bit Loading Bar */
@@ -355,10 +358,10 @@
             <div class="spinner"></div>
         </div>
         
-        <!-- Top Right Images - UPDATED ORDER -->
+        <!-- Top Right Images - Explicit 1.jpg on top of 2.jpg -->
         <div class="top-right-images" id="topRightImages">
-            <img src="RIVERADAMSME/2.jpg" class="top-right-image" alt="RiverAdams 2">
             <img src="RIVERADAMSME/1.jpg" class="top-right-image" alt="RiverAdams 1">
+            <img src="RIVERADAMSME/2.jpg" class="top-right-image" alt="RiverAdams 2">
         </div>
         
         <!-- Offset Carousel -->
@@ -416,12 +419,12 @@
             { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3", duration: 190 }
         ];
 
-        // Photo files
+        // Photo files - now only 1-11.jpg
         const photoFiles = [];
-        for (let i = 1; i <= 12; i++) {
+        for (let i = 1; i <= 11; i++) {  // Changed from 12 to 11
             photoFiles.push(`RIVERADAMSPICZ/${i}.jpg`);
         }
-        totalImages = photoFiles.length;
+        totalImages = photoFiles.length; // This will now be 11
 
         // Font classes for glitch effect
         const fontClasses = [
