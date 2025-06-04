@@ -20,6 +20,7 @@
             place-items: center;
             margin: 0;
             overflow: hidden;
+            position: relative; /* Needed for absolute positioning of floating image */
         }
         
         .handwritten {
@@ -186,6 +187,24 @@
             100% { transform: translate(calc(-50% + 7px), calc(-50% + 3px)); }
         }
         
+        /* Floating Bouncing Image */
+        #floatingImage {
+            position: absolute;
+            width: 90px; /* Same size as original top-right-image */
+            height: 90px; /* Same size as original top-right-image */
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid white; /* Thin white border */
+            z-index: 0; /* Behind everything */
+            display: none; /* Hidden initially */
+            cursor: grab;
+            user-select: none;
+        }
+
+        #floatingImage.grabbing {
+            cursor: grabbing;
+        }
+
         /* Rest of the original styles remain unchanged */
         /* Standalone Centered Slideshow */
         .slideshow-container {
@@ -203,13 +222,13 @@
             display: none;
         }
         
-        /* Top Right Images - 2.jpg on top of 1.jpg */
+        /* Top Right Images - only 2.jpg now */
         .top-right-images {
             position: fixed;
             top: 20px;
             right: 20px;
             width: 90px;
-            height: 180px;
+            height: 90px; /* Adjusted height since only one image */
             z-index: 1;
             display: none;
             flex-direction: column;
@@ -443,7 +462,7 @@
             }
             .top-right-images {
                 width: 80px;
-                height: 160px;
+                height: 80px; /* Adjusted height for single image */
                 right: 15px;
                 top: 15px;
             }
@@ -468,42 +487,39 @@
                 left: 15%;
                 width: 55%;
             }
+            #floatingImage {
+                width: 70px; /* Adjust size for mobile */
+                height: 70px; /* Adjust size for mobile */
+            }
         }
     </style>
 </head>
 <body>
     <div id="container">
-        <!-- Emoji Trigger -->
         <div class="emoji-wrapper">
             <span id="emoji" class="handwritten">📼</span>
         </div>
         
-        <!-- Hidden Text -->
         <span id="text" class="handwritten">RiverAdam$</span>
         
-        <!-- Standalone Slideshow (Center) -->
+        <img id="floatingImage" src="RIVERADAMSME/1.jpg" alt="Floating Image">
+
         <div class="slideshow-container" id="slideshow">
             <div class="spinner"></div>
         </div>
         
-        <!-- Top Right Images - 2.jpg on top of 1.jpg -->
         <div class="top-right-images" id="topRightImages">
             <img src="RIVERADAMSME/2.jpg" class="top-right-image" alt="RiverAdams 2">
-            <img src="RIVERADAMSME/1.jpg" class="top-right-image" alt="RiverAdams 1">
         </div>
         
-        <!-- Offset Carousel -->
         <div class="carousel-container" id="carousel"></div>
         
-        <!-- Progress bar for scrubbing -->
         <div class="progress-track" id="progressTrack">
             <div class="progress-fill" id="progressFill"></div>
         </div>
         
-        <!-- Wasteland Wanderer Character -->
         <div class="game-character" id="gameCharacter"></div>
         
-        <!-- Platform Links -->
         <div class="platform-links" id="platformLinks">
             <a href="https://music.apple.com/us/artist/river-adams/1554125278" class="platform-link" target="_blank">
                 <span class="platform-emoji apple">🍎</span>
@@ -532,6 +548,7 @@
         const progressTrack = document.getElementById('progressTrack');
         const progressFill = document.getElementById('progressFill');
         const spinner = document.querySelector('.spinner');
+        const floatingImage = document.getElementById('floatingImage');
         
         let currentAudio = null;
         let currentPlayingTrack = null;
@@ -543,6 +560,16 @@
         let totalImages = 0;
         let isDragging = false;
         let progressUpdateInterval = null;
+
+        // Floating image variables
+        let vx = 2; // Initial horizontal velocity (pixels per frame)
+        let vy = 2; // Initial vertical velocity (pixels per frame)
+        let animationFrameId;
+        let lastX = 0;
+        let lastY = 0;
+        let isFlicking = false;
+        let flickerStartTime;
+        let flickVelocityMultiplier = 8; // Adjust for stronger flick
 
         // Audio files
         const audioFiles = [
@@ -559,6 +586,9 @@
         // Photo files
         const photoFiles = [];
         for (let i = 1; i <= 11; i++) {
+            // Ensure 1.jpg is NOT in the slideshow array if it's meant to float separately
+            // For now, keeping it here for the slideshow, but the floating one is distinct.
+            // If you truly want to exclude 1.jpg from the slideshow, modify this loop.
             photoFiles.push(`RIVERADAMSPICZ/${i}.jpg`);
         }
         totalImages = photoFiles.length;
@@ -579,7 +609,16 @@
             spinner.style.display = 'block';
             slideshow.style.display = 'block';
             
-            photoFiles.forEach((photo, index) => {
+            // Filter out 1.jpg if it's meant to be solely the floating one
+            const slidesToLoad = photoFiles.filter(file => !file.includes('1.jpg')); // Exclude 1.jpg here
+            totalImages = slidesToLoad.length; // Update total images for the spinner
+
+            if (totalImages === 0) { // Handle case if no images or only 1.jpg was left
+                spinner.style.display = 'none';
+                return;
+            }
+
+            slidesToLoad.forEach((photo, index) => {
                 const slide = document.createElement('img');
                 slide.className = 'slide';
                 slide.src = photo;
@@ -606,15 +645,11 @@
                 
                 slideshow.appendChild(slide);
             });
-            
-            if (photoFiles.length === 0) {
-                spinner.style.display = 'none';
-            }
         }
 
         // Start slideshow with simple fade transition
         function startSlideshow() {
-            const slides = document.querySelectorAll('.slide:not([style*="display: none"])');
+            const slides = document.querySelectorAll('#slideshow .slide:not([style*="display: none"])');
             if (slides.length === 0) return;
 
             slides[0].classList.add('active');
@@ -689,6 +724,7 @@
                         platformLinks.style.display = 'flex';
                         createSlideshow();
                         initCarousel();
+                        initFloatingImage(); // Initialize floating image after glitch
                     }, 300);
                 }
             }, flashInterval);
@@ -824,11 +860,139 @@
             }, 300);
         });
 
+        // Floating Image Logic
+        function updateFloatingImagePosition() {
+            let currentLeft = parseFloat(floatingImage.style.left) || 0;
+            let currentTop = parseFloat(floatingImage.style.top) || 0;
+
+            let newLeft = currentLeft + vx;
+            let newTop = currentTop + vy;
+
+            const imgWidth = floatingImage.offsetWidth;
+            const imgHeight = floatingImage.offsetHeight;
+            const maxX = window.innerWidth - imgWidth;
+            const maxY = window.innerHeight - imgHeight;
+
+            // Boundary collision
+            if (newLeft < 0 || newLeft > maxX) {
+                vx *= -1; // Reverse horizontal direction
+                newLeft = Math.max(0, Math.min(newLeft, maxX)); // Keep within bounds
+            }
+            if (newTop < 0 || newTop > maxY) {
+                vy *= -1; // Reverse vertical direction
+                newTop = Math.max(0, Math.min(newTop, maxY)); // Keep within bounds
+            }
+
+            floatingImage.style.left = `${newLeft}px`;
+            floatingImage.style.top = `${newTop}px`;
+
+            animationFrameId = requestAnimationFrame(updateFloatingImagePosition);
+        }
+
+        function initFloatingImage() {
+            floatingImage.style.display = 'block';
+            // Set initial random position
+            floatingImage.style.left = `${Math.random() * (window.innerWidth - floatingImage.offsetWidth)}px`;
+            floatingImage.style.top = `${Math.random() * (window.innerHeight - floatingImage.offsetHeight)}px`;
+            
+            // Start the bouncing animation
+            animationFrameId = requestAnimationFrame(updateFloatingImagePosition);
+
+            // Flicking functionality
+            let isDraggingFloating = false;
+            let startX, startY;
+            let currentX, currentY;
+            let startTime;
+
+            floatingImage.addEventListener('mousedown', (e) => {
+                isDraggingFloating = true;
+                floatingImage.classList.add('grabbing');
+                startX = e.clientX;
+                startY = e.clientY;
+                currentX = startX;
+                currentY = startY;
+                startTime = performance.now(); // For flick detection
+
+                // Stop current animation to allow dragging
+                cancelAnimationFrame(animationFrameId);
+                
+                // Temporarily disable pointer-events on other elements to avoid interference during drag
+                carousel.style.pointerEvents = 'none';
+                platformLinks.style.pointerEvents = 'none';
+                slideshow.style.pointerEvents = 'none';
+                topRightImages.style.pointerEvents = 'none';
+                gameCharacter.style.pointerEvents = 'none';
+                progressTrack.style.pointerEvents = 'none';
+
+                // Prevent default drag behavior
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDraggingFloating) return;
+
+                const dx = e.clientX - currentX;
+                const dy = e.clientY - currentY;
+                
+                let newLeft = parseFloat(floatingImage.style.left) + dx;
+                let newTop = parseFloat(floatingImage.style.top) + dy;
+
+                // Clamp to window boundaries
+                newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - floatingImage.offsetWidth));
+                newTop = Math.max(0, Math.min(newTop, window.innerHeight - floatingImage.offsetHeight));
+
+                floatingImage.style.left = `${newLeft}px`;
+                floatingImage.style.top = `${newTop}px`;
+
+                currentX = e.clientX;
+                currentY = e.clientY;
+            });
+
+            document.addEventListener('mouseup', (e) => {
+                if (!isDraggingFloating) return;
+                isDraggingFloating = false;
+                floatingImage.classList.remove('grabbing');
+
+                // Re-enable pointer-events
+                carousel.style.pointerEvents = 'auto';
+                platformLinks.style.pointerEvents = 'auto';
+                slideshow.style.pointerEvents = 'auto';
+                topRightImages.style.pointerEvents = 'auto';
+                gameCharacter.style.pointerEvents = 'auto';
+                progressTrack.style.pointerEvents = 'auto';
+
+                const endTime = performance.now();
+                const deltaTime = endTime - startTime;
+
+                // Calculate flick velocity
+                const dragDistanceX = e.clientX - startX;
+                const dragDistanceY = e.clientY - startY;
+
+                // Only consider it a flick if moved quickly
+                if (deltaTime < 200 && (Math.abs(dragDistanceX) > 10 || Math.abs(dragDistanceY) > 10)) {
+                    vx = (dragDistanceX / deltaTime) * flickVelocityMultiplier; // Apply multiplier
+                    vy = (dragDistanceY / deltaTime) * flickVelocityMultiplier; // Apply multiplier
+                } else {
+                    // If not a flick, reset to a gentle bounce or previous velocity
+                    // For simplicity, let's just use the current dx/dy as the new velocity
+                    // or revert to a default if dx/dy are too small
+                    if (Math.abs(vx) < 2 && Math.abs(vy) < 2) {
+                         vx = (Math.random() < 0.5 ? 1 : -1) * 2;
+                         vy = (Math.random() < 0.5 ? 1 : -1) * 2;
+                    }
+                }
+                
+                // Resume animation with new velocity
+                animationFrameId = requestAnimationFrame(updateFloatingImagePosition);
+            });
+        }
+
         // Cleanup
         window.addEventListener('beforeunload', () => {
             if (slideInterval) clearInterval(slideInterval);
             if (characterAnimation) clearInterval(characterAnimation);
             if (progressUpdateInterval) clearInterval(progressUpdateInterval);
+            if (animationFrameId) cancelAnimationFrame(animationFrameId); // Stop floating image animation
         });
 
         // Handle window resize
@@ -838,6 +1002,19 @@
                 const progress = (currentAudio.currentTime / currentAudio.duration) * 50;
                 const startPosition = window.innerWidth <= 600 ? 15 : 25;
                 gameCharacter.style.left = `${startPosition + progress}%`;
+            }
+            // Ensure floating image stays within bounds on resize
+            if (floatingImage.style.display === 'block') {
+                let currentLeft = parseFloat(floatingImage.style.left) || 0;
+                let currentTop = parseFloat(floatingImage.style.top) || 0;
+
+                const imgWidth = floatingImage.offsetWidth;
+                const imgHeight = floatingImage.offsetHeight;
+                const maxX = window.innerWidth - imgWidth;
+                const maxY = window.innerHeight - imgHeight;
+
+                floatingImage.style.left = `${Math.max(0, Math.min(currentLeft, maxX))}px`;
+                floatingImage.style.top = `${Math.max(0, Math.min(currentTop, maxY))}px`;
             }
         });
     </script>
