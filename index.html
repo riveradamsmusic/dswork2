@@ -13,8 +13,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
         
         /* Base Styles */
         body {
@@ -82,8 +80,6 @@
         .font-marker { font-family: 'Permanent Marker', cursive; }
         .font-vt323 { font-family: 'VT323', monospace; }
         .font-major-mono { font-family: 'Major Mono Display', monospace; }
-        .font-bungee { font-family: 'Bungee', cursive; }
-        .font-monoton { font-family: 'Monoton', cursive; }
         
         /* Animations */
         @keyframes text-glitch {
@@ -247,8 +243,8 @@
         .track-2 { font-family: 'Comic Neue', cursive; top: 130px; left: 26px; }
         .track-3 { font-family: 'Permanent Marker', cursive; top: 221px; left: 65px; }
         .track-4 { font-family: 'Caveat', cursive; top: 260px; left: 130px; }
-        .track-5 { font-family: 'Press Start 2P', cursive; top: 221px; left: 195px; }
-        .track-6 { font-family: 'Rubik Doodle Shadow', cursive; top: 130px; left: 234px; }
+        .track-5 { font-family: 'Major Mono Display', monospace; top: 221px; left: 195px; } /* Changed for Wynwood */
+        .track-6 { font-family: 'VT323', monospace; top: 130px; left: 234px; } /* Changed for Mr. Solo */
         .track-7 { font-family: 'Comic Neue', cursive; top: 65px; left: 195px; }
         
         /* Platform Links */
@@ -343,8 +339,8 @@
         /* Floating Image */
         #floatingImage {
             position: absolute;
-            width: 40px;
-            height: 40px;
+            width: 40px; /* Changed from 60px to 40px */
+            height: 40px; /* Changed from 60px to 40px */
             object-fit: cover;
             z-index: 20;
             display: none;
@@ -431,8 +427,8 @@
             }
             
             #floatingImage {
-                width: 40px;
-                height: 40px;
+                width: 40px; /* Adjusted for mobile */
+                height: 40px; /* Adjusted for mobile */
             }
         }
     </style>
@@ -520,12 +516,12 @@
         const audioFiles = [
             { name: "21 Century", file: "RIVERADAMS/21_Century_copy.mp3", duration: 180 },
             { name: "Grey", file: "RIVERADAMS/grey_copy.mp3", duration: 210 },
-            { name: "Mr. Solo", file: "RIVERADAMS/Mr_Solo_copy.mp3", duration: 195, font: 'font-monoton' },
+            { name: "Mr. Solo", file: "RIVERADAMS/Mr_Solo_copy.mp3", duration: 195 },
             { name: "Opportunities", file: "RIVERADAMS/Opportunities_copy.mp3", duration: 225 },
             { name: "Rap (feat. AFEEGO)", file: "RIVERADAMS/Rap_feat_AFEEGO_copy.mp3", duration: 240 },
             { name: "Spoken Word", file: "RIVERADAMS/Spoken_Word_copy.mp3", duration: 180 },
             { name: "Trying", file: "RIVERADAMS/Trying_copy.mp3", duration: 200 },
-            { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3", duration: 190, font: 'font-bungee' }
+            { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3", duration: 190 }
         ];
 
         const photoFiles = Array.from({length: 11}, (_, i) => `RIVERADAMSPICZ/${i+1}.jpg`);
@@ -748,7 +744,7 @@
         function initCarousel() {
             audioFiles.forEach((track, index) => {
                 const trackElement = document.createElement('div');
-                trackElement.className = `track track-${index % 8} ${track.font || ''}`;
+                trackElement.className = `track track-${index % 8}`;
                 trackElement.textContent = track.name;
                 trackElement.dataset.index = index;
                 carousel.appendChild(trackElement);
@@ -805,7 +801,7 @@
 
             // Physics parameters
             const throwPower = 2.2;
-            const friction = 0.98;
+            const friction = 0.81;
             const bounceFactor = 0.7;
 
             function updateFloatingImage() {
