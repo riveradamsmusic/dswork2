@@ -337,18 +337,28 @@
         }
         
 	    /* Floating Image - Updated with higher z-index */
-	    #floatingImage {
-	        position: absolute;
-	        width: 60px;
-	        height: 60px;
-	        object-fit: cover;
-	        border-radius: 4px;
-	        z-index: 20; /* Changed from 0 to 20 */
-	        display: none;
-	        cursor: grab;
-	        user-select: none;
-	        touch-action: none; /* New line */
-	    }
+		#floatingImage {
+		    position: absolute;
+		    width: 60px;
+		    height: 60px;
+		    object-fit: cover;
+		    border-radius: 12px; /* More rounded corners */
+		    border: 2px solid #87CEEB; /* Sky blue border */
+		    box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3); /* Subtle glow */
+		    z-index: 20;
+		    display: none;
+		    cursor: grab;
+		    user-select: none;
+		    touch-action: none;
+		    transition: all 0.2s ease; /* Smooth transitions */
+		}
+		
+		#floatingImage.grabbing {
+		    cursor: grabbing;
+		    border-color: #4682B4; /* Darker blue when active */
+		    box-shadow: 0 4px 12px rgba(70, 130, 180, 0.5);
+		    transform: scale(0.98); /* Slight "pressed" effect */
+		}
 
 	    /* [Keep the existing #floatingImage.grabbing rule] */
 
@@ -796,14 +806,26 @@
 		    floatingImage.style.left = `${currentX}px`;
 		    floatingImage.style.top = `${currentY}px`;
 
+		    // New physics parameters
+		    const throwSensitivity = 0.5; // Lower = slower throws (0.1-1.0)
+		    const friction = 0.92; // Increased from 0.98 for faster slowdown
+		    const minVelocity = 0.2; // Minimum speed before stopping
+
 		    function updateFloatingImage() {
 		        if (!isDragging) {
 		            currentX += velocityX;
 		            currentY += velocityY;
+            
+		            // Apply friction
 		            velocityX *= friction;
 		            velocityY *= friction;
+            
+		            // Stop if velocity is very low
+		            if (Math.abs(velocityX) < minVelocity) velocityX = 0;
+		            if (Math.abs(velocityY) < minVelocity) velocityY = 0;
 
-		            const bounceFactor = 0.6;
+		            // Boundary checks with bounce
+		            const bounceFactor = 0.7;
 		            if (currentX < 0) {
 		                currentX = 0;
 		                velocityX *= -bounceFactor;
@@ -826,7 +848,7 @@
 		        animationFrameId = requestAnimationFrame(updateFloatingImage);
 		    }
 
-		    // Improved touch event handling
+		    // Touch/Mouse event handlers
 		    floatingImage.addEventListener('mousedown', handleDragStart);
 		    floatingImage.addEventListener('touchstart', handleDragStart, { passive: false });
 
@@ -837,6 +859,8 @@
 		    document.addEventListener('touchend', handleDragEnd);
 		    document.addEventListener('mouseleave', handleDragEnd);
 
+		    let dragStartTime, dragStartX, dragStartY;
+
 		    function handleDragStart(e) {
 		        isDragging = true;
 		        floatingImage.classList.add('grabbing');
@@ -845,8 +869,9 @@
 		        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
         
 		        if (clientX && clientY) {
-		            lastX = clientX;
-		            lastY = clientY;
+		            lastX = dragStartX = clientX;
+		            lastY = dragStartY = clientY;
+		            dragStartTime = Date.now();
 		        }
         
 		        velocityX = 0;
@@ -885,9 +910,23 @@
 		        floatingImage.classList.remove('grabbing');
 		        floatingImage.style.zIndex = '20';
         
-		        if (lastX && lastY) {
-		            velocityX = lastX - (currentX - parseFloat(floatingImage.style.left));
-		            velocityY = lastY - (currentY - parseFloat(floatingImage.style.top));
+		        // Calculate throw velocity based on swipe speed and direction
+		        if (lastX && lastY && dragStartX && dragStartY) {
+		            const dragDuration = Date.now() - dragStartTime;
+		            const dragDistanceX = lastX - dragStartX;
+		            const dragDistanceY = lastY - dragStartY;
+            
+		            // Only apply throw if there was significant movement
+		            if (dragDuration > 0 && (Math.abs(dragDistanceX) > 5 || Math.abs(dragDistanceY) > 5)) {
+		                // Calculate velocity based on distance and duration of drag
+		                velocityX = (dragDistanceX / dragDuration) * 1000 * throwSensitivity;
+		                velocityY = (dragDistanceY / dragDuration) * 1000 * throwSensitivity;
+                
+		                // Limit maximum speed
+		                const maxSpeed = 15;
+		                velocityX = Math.max(-maxSpeed, Math.min(maxSpeed, velocityX));
+		                velocityY = Math.max(-maxSpeed, Math.min(maxSpeed, velocityY));
+		            }
 		        }
 		    }
 
