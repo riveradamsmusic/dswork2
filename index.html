@@ -126,7 +126,7 @@
             transform: translate(-50%, -50%);
             width: 90px;
             height: 90px;
-            z-index: 1;
+            z-index: 10;
             overflow: hidden;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
@@ -212,7 +212,7 @@
             transform: translate(calc(-50% + 0.5cm), calc(-50% + 1.0cm));
             width: 390px;
             height: 390px;
-            z-index: 2;
+            z-index: 15;
         }
         
         .track {
@@ -336,43 +336,28 @@
             100% { transform: translateY(0); }
         }
         
-	    /* Floating Image - Updated with higher z-index */
-		#floatingImage {
-		    position: absolute;
-		    width: 60px;
-		    height: 60px;
-		    object-fit: cover;
-		    z-index: 20;
-		    display: none;
-		    cursor: grab;
-		    user-select: none;
-		    touch-action: none;
-    
-		    /* REPLACE/ADD these properties: */
-		    border-radius: 50%; /* Perfect circle */
-		    box-shadow: 0 3px 6px rgba(0,0,0,0.16); /* Subtle shadow */
-		    transition: transform 0.1s ease-out; /* Smooth scale effect */
-		    border: none; /* Remove if you previously had a border */
-		}
+        /* Floating Image */
+        #floatingImage {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            z-index: 20;
+            display: none;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            border-radius: 50%;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+            transition: transform 0.1s ease-out;
+            border: none;
+        }
 
-		#floatingImage.grabbing {
-		    transform: scale(0.92); /* Slight "pressed" effect */
-		    box-shadow: 0 5px 10px rgba(0,0,0,0.2); /* Deeper shadow when grabbed */
-		    cursor: grabbing;
-		}
-
-	    /* [Keep the existing #floatingImage.grabbing rule] */
-
-	    /* Update these z-index values */
-	    .slideshow-container {
-	        z-index: 10; /* Added this line */
-	        /* [Keep all other existing slideshow-container styles] */
-	    }
-    
-	    .carousel-container {
-	        z-index: 15; /* Added this line */
-	        /* [Keep all other existing carousel-container styles] */
-	    }
+        #floatingImage.grabbing {
+            transform: scale(0.92);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            cursor: grabbing;
+        }
         
         /* Mobile Responsive */
         @media only screen and (max-width: 600px) {
@@ -514,6 +499,7 @@
         let loadedImages = 0;
         let totalImages = 0;
         let isDragging = false;
+        let isDraggingFloatingImage = false;
         let progressUpdateInterval = null;
         
         // Floating Image Variables
@@ -683,7 +669,7 @@
         }
 
         function handleScrub(event) {
-            if (!currentAudio) return;
+            if (!currentAudio || isDraggingFloatingImage) return;
             
             const progressTrackRect = progressTrack.getBoundingClientRect();
             let clientX = event.clientX || (event.touches && event.touches[0] ? event.touches[0].clientX : null);
@@ -711,6 +697,7 @@
             progressUpdateInterval = setInterval(updateProgressBar, 100);
             
             gameCharacter.addEventListener('mousedown', (e) => {
+                if (isDraggingFloatingImage) return;
                 isDragging = true;
                 document.addEventListener('mousemove', handleScrub);
                 document.addEventListener('mouseup', () => {
@@ -720,6 +707,7 @@
             });
 
             gameCharacter.addEventListener('touchstart', (e) => {
+                if (isDraggingFloatingImage) return;
                 isDragging = true;
                 document.addEventListener('touchmove', handleScrub);
                 document.addEventListener('touchend', () => {
@@ -730,12 +718,16 @@
             });
             
             progressTrack.addEventListener('click', (e) => {
-                handleScrub(e);
+                if (!isDraggingFloatingImage) {
+                    handleScrub(e);
+                }
             });
 
             progressTrack.addEventListener('touchstart', (e) => {
-                handleScrub(e);
-                e.preventDefault();
+                if (!isDraggingFloatingImage) {
+                    handleScrub(e);
+                    e.preventDefault();
+                }
             }, { passive: false });
         }
 
@@ -800,117 +792,117 @@
         }
         
         // Floating Image Functions
-		function initFloatingImage() {
-		    floatingImage.style.display = 'block';
-		    currentX = Math.random() * (window.innerWidth - floatingImage.offsetWidth);
-		    currentY = Math.random() * (window.innerHeight - floatingImage.offsetHeight);
-		    floatingImage.style.left = `${currentX}px`;
-		    floatingImage.style.top = `${currentY}px`;
+        function initFloatingImage() {
+            floatingImage.style.display = 'block';
+            currentX = Math.random() * (window.innerWidth - floatingImage.offsetWidth);
+            currentY = Math.random() * (window.innerHeight - floatingImage.offsetHeight);
+            floatingImage.style.left = `${currentX}px`;
+            floatingImage.style.top = `${currentY}px`;
 
-		    // Physics parameters
-		    const throwPower = 2.2; // Increased velocity
-		    const friction = 0.98; // Smooth deceleration
-		    const bounceFactor = 0.7; // Energy retained on bounce
+            // Physics parameters
+            const throwPower = 2.2;
+            const friction = 0.98;
+            const bounceFactor = 0.7;
 
-		    function updateFloatingImage() {
-		        if (!isDragging) {
-		            // Apply friction (organic slowdown)
-		            velocityX *= friction;
-		            velocityY *= friction;
+            function updateFloatingImage() {
+                if (!isDraggingFloatingImage) {
+                    // Apply friction
+                    velocityX *= friction;
+                    velocityY *= friction;
             
-		            // Update position
-		            currentX += velocityX;
-		            currentY += velocityY;
+                    // Update position
+                    currentX += velocityX;
+                    currentY += velocityY;
 
-		            // Boundary checks with clean bounces
-		            if (currentX < 0) {
-		                currentX = 0;
-		                velocityX *= -bounceFactor;
-		            } else if (currentX > window.innerWidth - floatingImage.offsetWidth) {
-		                currentX = window.innerWidth - floatingImage.offsetWidth;
-		                velocityX *= -bounceFactor;
-		            }
+                    // Boundary checks with bounces
+                    if (currentX < 0) {
+                        currentX = 0;
+                        velocityX *= -bounceFactor;
+                    } else if (currentX > window.innerWidth - floatingImage.offsetWidth) {
+                        currentX = window.innerWidth - floatingImage.offsetWidth;
+                        velocityX *= -bounceFactor;
+                    }
 
-		            if (currentY < 0) {
-		                currentY = 0;
-		                velocityY *= -bounceFactor;
-		            } else if (currentY > window.innerHeight - floatingImage.offsetHeight) {
-		                currentY = window.innerHeight - floatingImage.offsetHeight;
-		                velocityY *= -bounceFactor;
-		            }
+                    if (currentY < 0) {
+                        currentY = 0;
+                        velocityY *= -bounceFactor;
+                    } else if (currentY > window.innerHeight - floatingImage.offsetHeight) {
+                        currentY = window.innerHeight - floatingImage.offsetHeight;
+                        velocityY *= -bounceFactor;
+                    }
 
-		            floatingImage.style.left = `${currentX}px`;
-		            floatingImage.style.top = `${currentY}px`;
-		        }
-		        animationFrameId = requestAnimationFrame(updateFloatingImage);
-		    }
+                    floatingImage.style.left = `${currentX}px`;
+                    floatingImage.style.top = `${currentY}px`;
+                }
+                animationFrameId = requestAnimationFrame(updateFloatingImage);
+            }
 
-		    // Track initial throw direction
-		    let throwVector = { x: 0, y: 0 };
+            // Track initial throw direction
+            let throwVector = { x: 0, y: 0 };
 
-		    floatingImage.addEventListener('mousedown', handleDragStart);
-		    floatingImage.addEventListener('touchstart', handleDragStart, { passive: false });
+            floatingImage.addEventListener('mousedown', handleDragStart);
+            floatingImage.addEventListener('touchstart', handleDragStart, { passive: false });
 
-		    document.addEventListener('mousemove', handleDragMove);
-		    document.addEventListener('touchmove', handleDragMove, { passive: false });
+            document.addEventListener('mousemove', handleDragMove);
+            document.addEventListener('touchmove', handleDragMove, { passive: false });
 
-		    document.addEventListener('mouseup', handleDragEnd);
-		    document.addEventListener('touchend', handleDragEnd);
+            document.addEventListener('mouseup', handleDragEnd);
+            document.addEventListener('touchend', handleDragEnd);
 
-		    function handleDragStart(e) {
-		        isDragging = true;
-		        floatingImage.classList.add('grabbing');
-		        throwVector = { x: 0, y: 0 };
+            function handleDragStart(e) {
+                isDraggingFloatingImage = true;
+                floatingImage.classList.add('grabbing');
+                throwVector = { x: 0, y: 0 };
         
-		        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-		        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
         
-		        if (clientX && clientY) {
-		            lastX = clientX;
-		            lastY = clientY;
-		        }
+                if (clientX && clientY) {
+                    lastX = clientX;
+                    lastY = clientY;
+                }
         
-		        if (e.cancelable) e.preventDefault();
-		    }
+                if (e.cancelable) e.preventDefault();
+            }
 
-		    function handleDragMove(e) {
-		        if (!isDragging) return;
+            function handleDragMove(e) {
+                if (!isDraggingFloatingImage) return;
         
-		        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-		        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
         
-		        if (!clientX || !clientY) return;
+                if (!clientX || !clientY) return;
         
-		        // Track movement vector
-		        throwVector.x = clientX - lastX;
-		        throwVector.y = clientY - lastY;
+                // Track movement vector
+                throwVector.x = clientX - lastX;
+                throwVector.y = clientY - lastY;
         
-		        currentX += throwVector.x;
-		        currentY += throwVector.y;
-		        floatingImage.style.left = `${currentX}px`;
-		        floatingImage.style.top = `${currentY}px`;
+                currentX += throwVector.x;
+                currentY += throwVector.y;
+                floatingImage.style.left = `${currentX}px`;
+                floatingImage.style.top = `${currentY}px`;
         
-		        lastX = clientX;
-		        lastY = clientY;
+                lastX = clientX;
+                lastY = clientY;
         
-		        if (e.cancelable) e.preventDefault();
-		    }
+                if (e.cancelable) e.preventDefault();
+            }
 
-		    function handleDragEnd() {
-		        if (!isDragging) return;
+            function handleDragEnd() {
+                if (!isDraggingFloatingImage) return;
         
-		        isDragging = false;
-		        floatingImage.classList.remove('grabbing');
+                isDraggingFloatingImage = false;
+                floatingImage.classList.remove('grabbing');
         
-		        // Apply pure linear velocity in throw direction
-		        if (Math.abs(throwVector.x) > 1 || Math.abs(throwVector.y) > 1) {
-		            velocityX = throwVector.x * throwPower * 0.3;
-		            velocityY = throwVector.y * throwPower * 0.3;
-		        }
-		    }
+                // Apply velocity in throw direction
+                if (Math.abs(throwVector.x) > 1 || Math.abs(throwVector.y) > 1) {
+                    velocityX = throwVector.x * throwPower * 0.3;
+                    velocityY = throwVector.y * throwPower * 0.3;
+                }
+            }
 
-		    updateFloatingImage();
-		}
+            updateFloatingImage();
+        }
 		
         // Event Listeners
         emojiWrapper.addEventListener('click', async () => {
