@@ -340,8 +340,8 @@
         /* Floating Image */
         #floatingImage {
             position: absolute;
-            width: 40px; /* Changed from 60px to 40px */
-            height: 40px; /* Changed from 60px to 40px */
+            width: 40px;
+            height: 40px;
             object-fit: cover;
             z-index: 20;
             display: none;
@@ -358,6 +358,31 @@
             transform: scale(0.92);
             box-shadow: 0 5px 10px rgba(0,0,0,0.2);
             cursor: grabbing;
+        }
+        
+        /* Smoke Trail Effect */
+        .smoke-trail {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+            pointer-events: none;
+            z-index: 19;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            animation: smoke-fade 1.5s ease-out forwards;
+        }
+
+        @keyframes smoke-fade {
+            0% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.5);
+            }
         }
         
         /* Mobile Responsive */
@@ -428,8 +453,8 @@
             }
             
             #floatingImage {
-                width: 40px; /* Adjusted for mobile */
-                height: 40px; /* Adjusted for mobile */
+                width: 40px;
+                height: 40px;
             }
         }
     </style>
@@ -512,6 +537,8 @@
         let velocityY = 0;
         const friction = 0.98;
         let animationFrameId;
+        let lastSmokeTime = 0;
+        const smokeInterval = 100; // milliseconds between smoke particles
 
         // Data
         const audioFiles = [
@@ -792,6 +819,24 @@
             });
         }
         
+        // Create smoke trail effect
+        function createSmokeTrail(x, y) {
+            const now = Date.now();
+            if (now - lastSmokeTime < smokeInterval) return;
+            lastSmokeTime = now;
+            
+            const smoke = document.createElement('div');
+            smoke.className = 'smoke-trail';
+            smoke.style.left = `${x}px`;
+            smoke.style.top = `${y}px`;
+            document.body.appendChild(smoke);
+            
+            // Remove smoke element after animation completes
+            setTimeout(() => {
+                smoke.remove();
+            }, 1500);
+        }
+        
         // Floating Image Functions
         function initFloatingImage() {
             floatingImage.style.display = 'block';
@@ -834,6 +879,14 @@
 
                     floatingImage.style.left = `${currentX}px`;
                     floatingImage.style.top = `${currentY}px`;
+                    
+                    // Create smoke trail when moving
+                    if (Math.abs(velocityX) > 0.1 || Math.abs(velocityY) > 0.1) {
+                        createSmokeTrail(
+                            currentX + floatingImage.offsetWidth / 2,
+                            currentY + floatingImage.offsetHeight / 2
+                        );
+                    }
                 }
                 animationFrameId = requestAnimationFrame(updateFloatingImage);
             }
