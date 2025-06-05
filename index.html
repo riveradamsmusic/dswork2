@@ -13,6 +13,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
+		
         
         /* Base Styles */
         body {
@@ -362,17 +363,26 @@
         /* Smoke Trail Effect */
         .smoke-trail {
             position: absolute;
-            width: 2px;
-            height: 2px;
-            background-color: rgba(255, 255, 255, 0.7);
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
             pointer-events: none;
             z-index: 19;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            animation: smoke-fade 1.5s ease-out forwards;
         }
-        
+
         @keyframes smoke-fade {
-            0% { opacity: 0.7; transform: scale(1); }
-            100% { opacity: 0; transform: scale(1.5); }
+            0% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.5);
+            }
         }
         
         /* Mobile Responsive */
@@ -527,9 +537,8 @@
         let velocityY = 0;
         const friction = 0.98;
         let animationFrameId;
-        let lastTrailTime = 0;
-        const trailInterval = 50; // milliseconds between trail particles
-        let trailPositions = [];
+        let lastSmokeTime = 0;
+        const smokeInterval = 100; // milliseconds between smoke particles
 
         // Data
         const audioFiles = [
@@ -810,24 +819,25 @@
             });
         }
         
-        // Create smoke trail particle
-        function createSmokeParticle(x, y) {
-            const particle = document.createElement('div');
-            particle.className = 'smoke-trail';
-            particle.style.left = `${x}px`;
-            particle.style.top = `${y}px`;
-            document.body.appendChild(particle);
+        // Create smoke trail effect
+        function createSmokeTrail(x, y) {
+            const now = Date.now();
+            if (now - lastSmokeTime < smokeInterval) return;
+            lastSmokeTime = now;
             
-            // Animate the particle
-            particle.style.animation = 'smoke-fade 0.8s forwards';
+            const smoke = document.createElement('div');
+            smoke.className = 'smoke-trail';
+            smoke.style.left = `${x}px`;
+            smoke.style.top = `${y}px`;
+            document.body.appendChild(smoke);
             
-            // Remove after animation completes
+            // Remove smoke element after animation completes
             setTimeout(() => {
-                particle.remove();
-            }, 800);
+                smoke.remove();
+            }, 1500);
         }
         
-        // Floating Image Functions with Smoke Trail
+        // Floating Image Functions
         function initFloatingImage() {
             floatingImage.style.display = 'block';
             currentX = Math.random() * (window.innerWidth - floatingImage.offsetWidth);
@@ -870,15 +880,12 @@
                     floatingImage.style.left = `${currentX}px`;
                     floatingImage.style.top = `${currentY}px`;
                     
-                    // Create smoke trail if moving
-                    const now = Date.now();
-                    if (now - lastTrailTime > trailInterval && 
-                        (Math.abs(velocityX) > 0.1 || Math.abs(velocityY) > 0.1)) {
-                        createSmokeParticle(
-                            currentX + floatingImage.offsetWidth/2,
-                            currentY + floatingImage.offsetHeight/2
+                    // Create smoke trail when moving
+                    if (Math.abs(velocityX) > 0.1 || Math.abs(velocityY) > 0.1) {
+                        createSmokeTrail(
+                            currentX + floatingImage.offsetWidth / 2,
+                            currentY + floatingImage.offsetHeight / 2
                         );
-                        lastTrailTime = now;
                     }
                 }
                 animationFrameId = requestAnimationFrame(updateFloatingImage);
