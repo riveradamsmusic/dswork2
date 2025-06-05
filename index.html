@@ -541,16 +541,16 @@
         const smokeInterval = 100; // milliseconds between smoke particles
 
         // Data
-		const audioFiles = [
-		    { name: "21 Century", file: "RIVERADAMS/21_Century_copy.mp3", duration: 180 },
-		    { name: "Grey", file: "RIVERADAMS/grey_copy.mp3", duration: 210 },
-		    { name: "Mr. Solo", file: "RIVERADAMS/Mr_Solo_copy.mp3", duration: 195, trackClass: 'track-3 font-permanent-marker' }, // Modified
-		    { name: "Opportunities", file: "RIVERADAMS/Opportunities_copy.mp3", duration: 225 },
-		    { name: "Rap (feat. AFEEGO)", file: "RIVERADAMS/Rap_feat_AFEEGO_copy.mp3", duration: 240 },
-		    { name: "Spoken Word", file: "RIVERADAMS/Spoken_Word_copy.mp3", duration: 180 },
-		    { name: "Trying", file: "RIVERADAMS/Trying_copy.mp3", duration: 200 },
-		    { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3", duration: 190, trackClass: 'track-7 font-vt323' } // Modified
-		];
+        const audioFiles = [
+            { name: "21 Century", file: "RIVERADAMS/21_Century_copy.mp3", duration: 180 },
+            { name: "Grey", file: "RIVERADAMS/grey_copy.mp3", duration: 210 },
+            { name: "Mr. Solo", file: "RIVERADAMS/Mr_Solo_copy.mp3", duration: 195 },
+            { name: "Opportunities", file: "RIVERADAMS/Opportunities_copy.mp3", duration: 225 },
+            { name: "Rap (feat. AFEEGO)", file: "RIVERADAMS/Rap_feat_AFEEGO_copy.mp3", duration: 240 },
+            { name: "Spoken Word", file: "RIVERADAMS/Spoken_Word_copy.mp3", duration: 180 },
+            { name: "Trying", file: "RIVERADAMS/Trying_copy.mp3", duration: 200 },
+            { name: "Wynwood", file: "RIVERADAMS/Wynwood_copy_Wav.mp3", duration: 190 }
+        ];
 
         const photoFiles = Array.from({length: 11}, (_, i) => `RIVERADAMSPICZ/${i+1}.jpg`);
         totalImages = photoFiles.length;
@@ -769,56 +769,55 @@
         }
 
         // Initialize Carousel
-		function initCarousel() {
-		    audioFiles.forEach((track, index) => {
-		        const trackElement = document.createElement('div');
-		        // Use custom trackClass if specified, otherwise use default positioning
-		        trackElement.className = track.trackClass || `track track-${index % 8}`;
-		        trackElement.textContent = track.name;
-		        trackElement.dataset.index = index;
-		        carousel.appendChild(trackElement);
-        
-		        trackElement.addEventListener('click', async () => {
-		            try {
-		                if (currentPlayingTrack === index) {
-		                    if (currentAudio.paused) {
-		                        await currentAudio.play();
-		                        animateCharacter(track.duration);
-		                    } else {
-		                        currentAudio.pause();
-		                        cleanupCharacterAnimation();
-		                    }
-		                    return;
-		                }
+        function initCarousel() {
+            audioFiles.forEach((track, index) => {
+                const trackElement = document.createElement('div');
+                trackElement.className = `track track-${index % 8}`;
+                trackElement.textContent = track.name;
+                trackElement.dataset.index = index;
+                carousel.appendChild(trackElement);
                 
-		                if (currentAudio) {
-		                    currentAudio.pause();
-		                    cleanupCharacterAnimation();
-		                }
-                
-		                currentAudio = new Audio(track.file);
-		                currentPlayingTrack = index;
-                
-		                currentAudio.onplay = () => {
-		                    animateCharacter(track.duration);
-		                };
-                
-		                currentAudio.onended = () => {
-		                    document.querySelector('.track.playing')?.classList.remove('playing');
-		                    currentPlayingTrack = null;
-		                    cleanupCharacterAnimation();
-		                };
-                
-		                await currentAudio.play();
-                
-		                document.querySelector('.track.playing')?.classList.remove('playing');
-		                trackElement.classList.add('playing');
-		            } catch (e) {
-		                console.error("Playback error:", e);
-		            }
-		        });
-		    });
-		}
+                trackElement.addEventListener('click', async () => {
+                    try {
+                        if (currentPlayingTrack === index) {
+                            if (currentAudio.paused) {
+                                await currentAudio.play();
+                                animateCharacter(track.duration);
+                            } else {
+                                currentAudio.pause();
+                                cleanupCharacterAnimation();
+                            }
+                            return;
+                        }
+                        
+                        if (currentAudio) {
+                            currentAudio.pause();
+                            cleanupCharacterAnimation();
+                        }
+                        
+                        currentAudio = new Audio(track.file);
+                        currentPlayingTrack = index;
+                        
+                        currentAudio.onplay = () => {
+                            animateCharacter(track.duration);
+                        };
+                        
+                        currentAudio.onended = () => {
+                            document.querySelector('.track.playing')?.classList.remove('playing');
+                            currentPlayingTrack = null;
+                            cleanupCharacterAnimation();
+                        };
+                        
+                        await currentAudio.play();
+                        
+                        document.querySelector('.track.playing')?.classList.remove('playing');
+                        trackElement.classList.add('playing');
+                    } catch (e) {
+                        console.error("Playback error:", e);
+                    }
+                });
+            });
+        }
         
         // Create smoke trail effect
         function createSmokeTrail(x, y) {
