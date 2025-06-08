@@ -17,7 +17,7 @@
         
         /* Base Styles */
         body {
-            background: #181F26;
+            background: #1a262e;
             height: 100vh;
             display: grid;
             place-items: center;
@@ -384,18 +384,37 @@
                 transform: translate(-50%, -50%) scale(1.5);
             }
         }
-        
-        /* Mobile Responsive */
-        @media only screen and (max-width: 600px) {
-            #emoji {
-                font-size: 100px;
-                width: 100px;
-                height: 100px;
-            }
-            
-            #text {
-                font-size: 32px;
-            }
+		
+		#afeegoVideoContainer {
+		    display: none;
+		    position: fixed;
+		    left: 20px;
+		    bottom: 20px;
+		    z-index: 100;
+		    background: transparent;
+		    padding: 0;
+		    max-width: 50%; /* Prevent it from being too wide */
+		}
+
+		#afeegoVideo {
+		    border-radius: 8px;
+		    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+		    width: 240px; /* Fixed width for desktop */
+		    height: 135px; /* Fixed height for desktop */
+		}
+
+		@media only screen and (max-width: 600px) {
+		    #afeegoVideoContainer {
+		        left: 10px;
+		        bottom: 10px;
+		        max-width: 60%; /* Slightly larger on mobile but not full-width */
+		    }
+    
+		    #afeegoVideo {
+		        width: 160px !important; /* Smaller on mobile */
+		        height: 90px !important;
+		    }
+		}
             
             .carousel-container {
                 width: 300px;
@@ -515,6 +534,8 @@
         const progressFill = document.getElementById('progressFill');
         const spinner = document.querySelector('.spinner');
         const floatingImage = document.getElementById('floatingImage');
+		const videoContainer = document.getElementById('videoContainer');
+		const afeegoVideo = document.getElementById('afeegoVideo');
         
         // State Variables
         let currentAudio = null;
@@ -527,6 +548,8 @@
         let isDragging = false;
         let isDraggingFloatingImage = false;
         let progressUpdateInterval = null;
+		let isVideoPlaying = false;
+		let hasAfeegoVideoPlayed = false; // Track if video was shown before
         
         // Floating Image Variables
         let lastX = 0;
@@ -769,55 +792,88 @@
         }
 
         // Initialize Carousel
-        function initCarousel() {
-            audioFiles.forEach((track, index) => {
-                const trackElement = document.createElement('div');
-                trackElement.className = `track track-${index % 8}`;
-                trackElement.textContent = track.name;
-                trackElement.dataset.index = index;
-                carousel.appendChild(trackElement);
+		function initCarousel() {
+		    let afeegoVideoPlayed = false; // Track if AFEEGO video has been played
+    
+		    audioFiles.forEach((track, index) => {
+		        const trackElement = document.createElement('div');
+		        trackElement.className = `track track-${index % 8}`;
+		        trackElement.textContent = track.name;
+		        trackElement.dataset.index = index;
+		        carousel.appendChild(trackElement);
+
+		        trackElement.addEventListener('click', async () => {
+		            try {
+		                // Pause/resume logic for all tracks
+		                if (currentPlayingTrack === index && currentAudio) {
+		                    if (currentAudio.paused) {
+		                        await currentAudio.play();
+		                        document.querySelector('.track.playing')?.classList.add('playing');
+		                    } else {
+		                        currentAudio.pause();
+		                        document.querySelector('.track.playing')?.classList.remove('playing');
+		                    }
+		                    return;
+		                }
+
+		                // Stop current audio
+		                if (currentAudio) currentAudio.pause();
+
+		                // AFEEGO video handling (only first time)
+		                if (track.name.includes("AFEEGO") && !afeegoVideoPlayed) {
+		                    const video = document.getElementById('afeegoVideo');
+		                    const videoContainer = document.getElementById('afeegoVideoContainer');
+                    
+		                    video.currentTime = 0;
+		                    videoContainer.style.display = 'block';
+		                    afeegoVideoPlayed = true;
+                    
+		                    video.onended = () => {
+		                        videoContainer.style.display = 'none';
+		                        playTrack(track, index, trackElement);
+		                    };
+                    
+		                    try {
+		                        await video.play();
+		                        return;
+		                    } catch (e) {
+		                        console.error("Video play failed:", e);
+		                        videoContainer.style.display = 'none';
+		                    }
+		                }
+
+		                // Normal track play
+		                playTrack(track, index, trackElement);
                 
-                trackElement.addEventListener('click', async () => {
-                    try {
-                        if (currentPlayingTrack === index) {
-                            if (currentAudio.paused) {
-                                await currentAudio.play();
-                                animateCharacter(track.duration);
-                            } else {
-                                currentAudio.pause();
-                                cleanupCharacterAnimation();
-                            }
-                            return;
-                        }
-                        
-                        if (currentAudio) {
-                            currentAudio.pause();
-                            cleanupCharacterAnimation();
-                        }
-                        
-                        currentAudio = new Audio(track.file);
-                        currentPlayingTrack = index;
-                        
-                        currentAudio.onplay = () => {
-                            animateCharacter(track.duration);
-                        };
-                        
-                        currentAudio.onended = () => {
-                            document.querySelector('.track.playing')?.classList.remove('playing');
-                            currentPlayingTrack = null;
-                            cleanupCharacterAnimation();
-                        };
-                        
-                        await currentAudio.play();
-                        
-                        document.querySelector('.track.playing')?.classList.remove('playing');
-                        trackElement.classList.add('playing');
-                    } catch (e) {
-                        console.error("Playback error:", e);
-                    }
-                });
-            });
-        }
+		            } catch (e) {
+		                console.error("Playback error:", e);
+		            }
+		        });
+		    });
+		}
+		
+		// Helper function to play audio tracks
+		function playTrack(track, index, element) {
+		    // If we're switching tracks, create new audio
+		    if (currentPlayingTrack !== index || !currentAudio) {
+		        currentAudio = new Audio(track.file);
+		        currentPlayingTrack = index;
+		    }
+
+		    currentAudio.onplay = () => {
+		        animateCharacter(track.duration);
+		        document.querySelectorAll('.track').forEach(t => t.classList.remove('playing'));
+		        element.classList.add('playing');
+		    };
+
+		    currentAudio.onended = () => {
+		        element.classList.remove('playing');
+		        currentPlayingTrack = null;
+		        cleanupCharacterAnimation();
+		    };
+
+		    currentAudio.play();
+		}
         
         // Create smoke trail effect
         function createSmokeTrail(x, y) {
@@ -973,5 +1029,10 @@
             }, 500);
         });
     </script>
+	<div id="afeegoVideoContainer" style="display: none; position: fixed; 		left: 20px; bottom: 20px; z-index: 100;">
+ 	   	<video id="afeegoVideo" width="320" height="180" controls 			style="border-radius: 8px; box-shadow: 0 4px 12px 			rgba(0,0,0,0.3);">
+				<source src="AFEEGO/1.mp4" type="video/mp4">
+		</video>
+	</div>
 </body>
 </html>
