@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>RiverAdam$</title>
+    
+    <meta name="theme-color" content="#000000"> 
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
         /* Google Font Imports */
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
@@ -14,25 +18,24 @@
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
 		
-        
         /* Base Styles */
-	body {
-    	    background-image: url('GITBACK/wall.png');
-    	    background-size: cover;
-    	    background-position: center;
-    	    background-repeat: no-repeat;
-    	    background-attachment: fixed;
-	    height: 100vh;
-	    height: 100dvh; /* Dynamic viewport height for mobile */
-	    min-height: 100vh;
-	    min-height: 100dvh;
-	    display: grid;
-	    place-items: center;
-	    margin: 0;
-	    padding: 0;
-	    overflow: hidden;
-	    position: relative;
-	}
+	    body {
+            background-image: url('GITBACK/wall.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+	        height: 100vh;
+	        height: 100dvh; /* Dynamic viewport height for mobile */
+	        min-height: 100vh;
+	        min-height: 100dvh;
+	        display: grid;
+	        place-items: center;
+	        margin: 0;
+	        padding: 0;
+	        overflow: hidden;
+	        position: relative;
+	    }
         
         .handwritten {
             font-family: 'Caveat', cursive;
@@ -269,7 +272,7 @@
         
         .track.playing {
             color: #00ff00;
-    	    text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00, 0 0 20px #00ff00;
+            text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00, 0 0 20px #00ff00;
         }
         
         /* Track Positions */
@@ -438,27 +441,26 @@
 		}
 
 		@media screen and (max-width: 768px) {
-    		    body {
-        	        background-attachment: scroll; /* Better performance on mobile */
-        	        height: 100vh;
-        	        height: 100dvh;
+            body {
+                background-attachment: scroll; /* Better performance on mobile */
+                height: 100vh;
+                height: 100dvh;
         		min-height: -webkit-fill-available;
-    		    }
-    
-    		    html {
-        	        height: -webkit-fill-available;
-    		    }
+            }
+   
+            html {
+                height: -webkit-fill-available;
+            }
 		    #afeegoVideoContainer {
 		        left: 10px;
 		        bottom: 10px;
 		        max-width: 60%; /* Slightly larger on mobile but not full-width */
 		    }
-    
+   
 		    #afeegoVideo {
 		        width: 160px !important; /* Smaller on mobile */
 		        height: 90px !important;
 		    }
-		}
             
             .carousel-container {
                 width: 300px;
