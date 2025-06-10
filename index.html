@@ -2,11 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>RiverAdam$</title>
     
-    <meta name="theme-color" content="#000000"> 
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <meta name="theme-color" content="#000000">
+
+    <link rel="apple-touch-startup-image" href="GITBACK/wall.png">
 
     <style>
         /* Google Font Imports */
@@ -19,23 +24,39 @@
         @import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
 		
         /* Base Styles */
+        html {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #000; /* Fallback background */
+        }
+
 	    body {
             background-image: url('GITBACK/wall.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-attachment: fixed;
-	        height: 100vh;
-	        height: 100dvh; /* Dynamic viewport height for mobile */
-	        min-height: 100vh;
-	        min-height: 100dvh;
-	        display: grid;
-	        place-items: center;
+            background-attachment: fixed; /* Use fixed for a static, non-scrolling background */
+            height: 100%;
+            width: 100%;
 	        margin: 0;
 	        padding: 0;
 	        overflow: hidden;
 	        position: relative;
 	    }
+
+        /* === FORCED LAYOUT FIX === */
+        /* This forces your main content container to fill the entire screen in the web app window. */
+        #container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden; /* Hide anything that might try to overflow */
+            display: grid; /* Re-apply grid here to center content */
+            place-items: center; /* Re-apply centering here */
+        }
         
         .handwritten {
             font-family: 'Caveat', cursive;
@@ -441,15 +462,9 @@
 		}
 
 		@media screen and (max-width: 768px) {
-            html, body {
-                height: 100%;
-                overflow: hidden;
-            }
-            body {
-                background-attachment: scroll; /* Better performance on mobile */
-                min-height: 100dvh;
-            }
-   
+            /* Mobile styles have been integrated into the main styles for simplicity */
+            /* The #container fix handles the primary layout issue */
+
 		    #afeegoVideoContainer {
 		        left: 10px;
 		        bottom: 10px;
