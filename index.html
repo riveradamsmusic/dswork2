@@ -16,19 +16,23 @@
 		
         
         /* Base Styles */
-        body {
-        	background-image: url('GITBACK/wall7.png');
-    		background-size: cover;
-    		background-position: center;
-    		background-repeat: no-repeat;
-    		background-attachment: fixed;
-    		height: 100vh;
-    		display: grid;
-    		place-items: center;
-    		margin: 0;
-    		overflow: hidden;
-    		position: relative;
-        }
+	body {
+    	    background-image: url('GITBACK/wall7.png');
+    	    background-size: cover;
+    	    background-position: center;
+    	    background-repeat: no-repeat;
+    	    background-attachment: fixed;
+	    height: 100vh;
+	    height: 100dvh; /* Dynamic viewport height for mobile */
+	    min-height: 100vh;
+	    min-height: 100dvh;
+	    display: grid;
+	    place-items: center;
+	    margin: 0;
+	    padding: 0;
+	    overflow: hidden;
+	    position: relative;
+	}
         
         .handwritten {
             font-family: 'Caveat', cursive;
