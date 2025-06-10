@@ -441,16 +441,15 @@
 		}
 
 		@media screen and (max-width: 768px) {
+            html, body {
+                height: 100%;
+                overflow: hidden;
+            }
             body {
                 background-attachment: scroll; /* Better performance on mobile */
-                height: 100vh;
-                height: 100dvh;
-        		min-height: -webkit-fill-available;
+                min-height: 100dvh;
             }
    
-            html {
-                height: -webkit-fill-available;
-            }
 		    #afeegoVideoContainer {
 		        left: 10px;
 		        bottom: 10px;
