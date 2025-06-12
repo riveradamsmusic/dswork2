@@ -276,8 +276,12 @@
 		}
 
 		@keyframes bounce {
-		    from { transform: translateY(0); }
-		    to { transform: translateY(10px); }
+		    from { 
+		        transform: translateY(5px); /* Start 5px lower */
+		    }
+		    to { 
+		        transform: translateY(15px); /* Move down to 15px */
+		    }
 		}
         
         /* Carousel Styles */
@@ -389,16 +393,16 @@
 		}
         
         /* Progress Bar */
-        .progress-track {
-            position: fixed;
-            top: 40px;
-            left: 25%;
-            width: 50%;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            z-index: 99;
-            display: none;
-        }
+		.progress-track {
+		    position: fixed;
+		    top: 40px;
+		    left: 40%; /* Changed from 25% to 40% (25 + 15) */
+		    width: 35%; /* Reduced from 50% to 35% (50 - 15) */
+		    height: 4px;
+		    background: rgba(255,255,255,0.2);
+		    z-index: 99;
+		    display: none;
+		}
         
         .progress-fill {
             position: absolute;
@@ -557,12 +561,12 @@
 		        left: 15%;
 		    }
             
-            .progress-track {
-                top: 35px;
-                height: 3px;
-                left: 15%;
-                width: 55%;
-            }
+		    .progress-track {
+		        top: 35px;
+		        left: 30%; /* Adjusted from 15% */
+		        width: 40%; /* Adjusted from 55% */
+		        height: 3px;
+		    }
             
             #floatingImage {
                 width: 40px;
@@ -808,19 +812,14 @@
 		        const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
 		        progressFill.style.width = `${progress}%`;
 
-		        // --- START OF CHANGE ---
 		        const isMobile = window.innerWidth <= 768;
-		        const startPositionPercent = isMobile ? 15 : 25;
-		        const trackWidthPercent = isMobile ? 55 : 50; // Widths from your CSS
-		        const characterWidth = isMobile ? 30 : 40;
+		        const startPositionPercent = isMobile ? 30 : 40; // Updated values
+		        const trackWidthPercent = isMobile ? 40 : 35; // Updated values
+		        const characterWidth = isMobile ? 33 : 44;
 		        const offset = characterWidth / 2;
 
-		        // Calculate new percentage position along the track
 		        const newPositionPercent = startPositionPercent + (progress / 100 * trackWidthPercent);
-
-		        // Apply the new position, subtracting the offset to keep it centered
 		        gameCharacter.style.left = `calc(${newPositionPercent}% - ${offset}px)`;
-		        // --- END OF CHANGE ---
 		    }
 		}
 
@@ -837,19 +836,14 @@
 		    currentAudio.currentTime = scrubPosition * currentAudio.duration;
 		    progressFill.style.width = `${scrubPosition * 100}%`;
 
-		    // --- START OF CHANGE ---
 		    const isMobile = window.innerWidth <= 768;
-		    const startPositionPercent = isMobile ? 15 : 25;
-		    const trackWidthPercent = isMobile ? 55 : 50;
-		    const characterWidth = isMobile ? 30 : 40;
+		    const startPositionPercent = isMobile ? 30 : 40; // Updated values
+		    const trackWidthPercent = isMobile ? 40 : 35; // Updated values
+		    const characterWidth = isMobile ? 33 : 44;
 		    const offset = characterWidth / 2;
 
-		    // Calculate new percentage position based on scrub
 		    const newPositionPercent = startPositionPercent + (scrubPosition * trackWidthPercent);
-
-		    // Apply the new position with the centering offset
 		    gameCharacter.style.left = `calc(${newPositionPercent}% - ${offset}px)`;
-		    // --- END OF CHANGE ---
 		}
 
         // Character Animation
@@ -857,17 +851,12 @@
 		    gameCharacter.style.display = 'block';
 		    progressTrack.style.display = 'block';
 
-		    // --- START OF CHANGE ---
-		    // Get character and track details based on screen size from your CSS
 		    const isMobile = window.innerWidth <= 768;
-		    const characterWidth = isMobile ? 30 : 40; // 30px on mobile, 40px on desktop
-		    const startPositionPercent = isMobile ? 15 : 25;
+		    const characterWidth = isMobile ? 33 : 44;
+		    const startPositionPercent = isMobile ? 30 : 40; // Updated values
 		    const offset = characterWidth / 2;
 
-		    // Set initial position, centering the character at the start of the track
 		    gameCharacter.style.left = `calc(${startPositionPercent}% - ${offset}px)`;
-		    // --- END OF CHANGE ---
-
 		    progressFill.style.width = '0%';
 		    progressUpdateInterval = setInterval(updateProgressBar, 100);
 
