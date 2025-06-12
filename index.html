@@ -32,7 +32,7 @@
         }
 
 	    body {
-            background-image: url('GITBACK/wall3.png');
+            background-image: url('GITBACK/wall7.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -354,20 +354,21 @@
         }
         
         /* Game Character */
-        .game-character {
-            position: fixed;
-            top: 20px;
-            left: 25%;
-            width: 40px;
-            height: 40px;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="10" width="6" height="8" fill="%239b59b6"/><rect x="8" y="14" width="8" height="2" fill="%236a3d8a"/><circle cx="11" cy="12" r="1" fill="%23000"/><circle cx="13" cy="12" r="1" fill="%23000"/></svg>');
-            background-size: contain;
-            background-repeat: no-repeat;
-            z-index: 100;
-            display: none;
-            animation: walk 0.5s steps(2) infinite;
-            cursor: ew-resize;
-        }
+		/* Game Character */
+		.game-character {
+		    position: fixed;
+		    top: 20px;
+		    left: 25%;
+		    width: 44px;
+		    height: 44px;
+		    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="9" y="10" width="6" height="8" fill="%239b59b6"/><rect x="8" y="14" width="8" height="2" fill="%236a3d8a"/><circle cx="11" cy="12" r="1" fill="%23000"/><circle cx="13" cy="12" r="1" fill="%23000"/></svg>');
+		    background-size: contain;
+		    background-repeat: no-repeat;
+		    z-index: 100;
+		    display: none;
+		    animation: walk 0.5s steps(2) infinite;
+		    cursor: ew-resize;
+		}
         
         /* Progress Bar */
         .progress-track {
@@ -519,11 +520,11 @@
                 padding: 6px;
             }
             
-            .game-character {
-                width: 30px;
-                height: 30px;
-                left: 15%;
-            }
+		    .game-character {
+		        width: 33px; /* Increased by 35% */
+		        height: 33px; /* Increased by 35% */
+		        left: 15%;
+		    }
             
             .progress-track {
                 top: 35px;
@@ -771,79 +772,108 @@
         }
 
         // Progress Bar Functions
-        function updateProgressBar() {
-            if (currentAudio && !isDragging) {
-                const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
-                progressFill.style.width = `${progress}%`;
-                const screenWidth = window.innerWidth;
-                const startPosition = screenWidth <= 600 ? 15 : 25;
-                const newPosition = startPosition + (progress * 0.5);
-                gameCharacter.style.left = `${newPosition}%`;
-            }
-        }
+		function updateProgressBar() {
+		    if (currentAudio && !isDragging) {
+		        const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+		        progressFill.style.width = `${progress}%`;
 
-        function handleScrub(event) {
-            if (!currentAudio || isDraggingFloatingImage) return;
-            
-            const progressTrackRect = progressTrack.getBoundingClientRect();
-            let clientX = event.clientX || (event.touches && event.touches[0] ? event.touches[0].clientX : null);
-            if (clientX === null) return;
+		        // --- START OF CHANGE ---
+		        const isMobile = window.innerWidth <= 768;
+		        const startPositionPercent = isMobile ? 15 : 25;
+		        const trackWidthPercent = isMobile ? 55 : 50; // Widths from your CSS
+		        const characterWidth = isMobile ? 30 : 40;
+		        const offset = characterWidth / 2;
 
-            let scrubPosition = (clientX - progressTrackRect.left) / progressTrackRect.width;
-            scrubPosition = Math.max(0, Math.min(1, scrubPosition));
-            
-            currentAudio.currentTime = scrubPosition * currentAudio.duration;
-            progressFill.style.width = `${scrubPosition * 100}%`;
-            
-            const screenWidth = window.innerWidth;
-            const startPosition = screenWidth <= 600 ? 15 : 25;
-            const newPosition = startPosition + (scrubPosition * 50);
-            gameCharacter.style.left = `${newPosition}%`;
-        }
+		        // Calculate new percentage position along the track
+		        const newPositionPercent = startPositionPercent + (progress / 100 * trackWidthPercent);
+
+		        // Apply the new position, subtracting the offset to keep it centered
+		        gameCharacter.style.left = `calc(${newPositionPercent}% - ${offset}px)`;
+		        // --- END OF CHANGE ---
+		    }
+		}
+
+		function handleScrub(event) {
+		    if (!currentAudio || isDraggingFloatingImage) return;
+
+		    const progressTrackRect = progressTrack.getBoundingClientRect();
+		    let clientX = event.clientX || (event.touches && event.touches[0] ? event.touches[0].clientX : null);
+		    if (clientX === null) return;
+
+		    let scrubPosition = (clientX - progressTrackRect.left) / progressTrackRect.width;
+		    scrubPosition = Math.max(0, Math.min(1, scrubPosition));
+
+		    currentAudio.currentTime = scrubPosition * currentAudio.duration;
+		    progressFill.style.width = `${scrubPosition * 100}%`;
+
+		    // --- START OF CHANGE ---
+		    const isMobile = window.innerWidth <= 768;
+		    const startPositionPercent = isMobile ? 15 : 25;
+		    const trackWidthPercent = isMobile ? 55 : 50;
+		    const characterWidth = isMobile ? 30 : 40;
+		    const offset = characterWidth / 2;
+
+		    // Calculate new percentage position based on scrub
+		    const newPositionPercent = startPositionPercent + (scrubPosition * trackWidthPercent);
+
+		    // Apply the new position with the centering offset
+		    gameCharacter.style.left = `calc(${newPositionPercent}% - ${offset}px)`;
+		    // --- END OF CHANGE ---
+		}
 
         // Character Animation
-        function animateCharacter(duration) {
-            gameCharacter.style.display = 'block';
-            progressTrack.style.display = 'block';
-            gameCharacter.style.left = window.innerWidth <= 600 ? '15%' : '25%';
-            progressFill.style.width = '0%';
-            
-            progressUpdateInterval = setInterval(updateProgressBar, 100);
-            
-            gameCharacter.addEventListener('mousedown', (e) => {
-                if (isDraggingFloatingImage) return;
-                isDragging = true;
-                document.addEventListener('mousemove', handleScrub);
-                document.addEventListener('mouseup', () => {
-                    isDragging = false;
-                    document.removeEventListener('mousemove', handleScrub);
-                });
-            });
+		function animateCharacter(duration) {
+		    gameCharacter.style.display = 'block';
+		    progressTrack.style.display = 'block';
 
-            gameCharacter.addEventListener('touchstart', (e) => {
-                if (isDraggingFloatingImage) return;
-                isDragging = true;
-                document.addEventListener('touchmove', handleScrub);
-                document.addEventListener('touchend', () => {
-                    isDragging = false;
-                    document.removeEventListener('touchmove', handleScrub);
-                });
-                e.preventDefault();
-            });
-            
-            progressTrack.addEventListener('click', (e) => {
-                if (!isDraggingFloatingImage) {
-                    handleScrub(e);
-                }
-            });
+		    // --- START OF CHANGE ---
+		    // Get character and track details based on screen size from your CSS
+		    const isMobile = window.innerWidth <= 768;
+		    const characterWidth = isMobile ? 30 : 40; // 30px on mobile, 40px on desktop
+		    const startPositionPercent = isMobile ? 15 : 25;
+		    const offset = characterWidth / 2;
 
-            progressTrack.addEventListener('touchstart', (e) => {
-                if (!isDraggingFloatingImage) {
-                    handleScrub(e);
-                    e.preventDefault();
-                }
-            }, { passive: false });
-        }
+		    // Set initial position, centering the character at the start of the track
+		    gameCharacter.style.left = `calc(${startPositionPercent}% - ${offset}px)`;
+		    // --- END OF CHANGE ---
+
+		    progressFill.style.width = '0%';
+		    progressUpdateInterval = setInterval(updateProgressBar, 100);
+
+		    gameCharacter.addEventListener('mousedown', (e) => {
+		        if (isDraggingFloatingImage) return;
+		        isDragging = true;
+		        document.addEventListener('mousemove', handleScrub);
+		        document.addEventListener('mouseup', () => {
+		            isDragging = false;
+		            document.removeEventListener('mousemove', handleScrub);
+		        });
+		    });
+
+		    gameCharacter.addEventListener('touchstart', (e) => {
+		        if (isDraggingFloatingImage) return;
+		        isDragging = true;
+		        document.addEventListener('touchmove', handleScrub);
+		        document.addEventListener('touchend', () => {
+		            isDragging = false;
+		            document.removeEventListener('touchmove', handleScrub);
+		        });
+		        e.preventDefault();
+		    });
+
+		    progressTrack.addEventListener('click', (e) => {
+		        if (!isDraggingFloatingImage) {
+		            handleScrub(e);
+		        }
+		    });
+
+		    progressTrack.addEventListener('touchstart', (e) => {
+		        if (!isDraggingFloatingImage) {
+		            handleScrub(e);
+		            e.preventDefault();
+		        }
+		    }, { passive: false });
+		}
 
         function cleanupCharacterAnimation() {
             clearInterval(progressUpdateInterval);
