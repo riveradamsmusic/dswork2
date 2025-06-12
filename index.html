@@ -396,6 +396,19 @@
             50% { transform: translateY(-5px); }
             100% { transform: translateY(0); }
         }
+		
+		/* Glowing effect for progress bar fill */
+		.progress-fill.glowing-bar {
+		    background-color: #9b59b6; /* Changed to purple */
+		    box-shadow: 0 0 5px rgba(155, 89, 182, 0.7), 0 0 10px rgba(155, 89, 182, 0.5), 0 0 15px rgba(155, 89, 182, 0.3); /* Changed to purple */
+		    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+		}
+
+		/* Glowing effect for the character */
+		.game-character.glowing-character {
+		    filter: drop-shadow(0 0 4px #9b59b6) drop-shadow(0 0 8px #9b59b6); /* Changed to purple */
+		    transition: filter 0.4s ease;
+		}
         
         /* Floating Image */
         #floatingImage {
@@ -946,24 +959,51 @@
 		}
 		
 		// Helper function to play audio tracks
+		// Helper function to play audio tracks
 		function playTrack(track, index, element) {
-		    // If we're switching tracks, create new audio
+		    const progressFill = document.getElementById('progressFill');
+		    const gameCharacter = document.getElementById('gameCharacter');
+
+		    // If we're switching tracks, create a new audio object
 		    if (currentPlayingTrack !== index || !currentAudio) {
+		        if (currentAudio) {
+		            currentAudio.pause(); // Stop the previous track
+		        }
 		        currentAudio = new Audio(track.file);
 		        currentPlayingTrack = index;
 		    }
 
+		    // --- START OF UPDATED LOGIC ---
+		    // When the audio starts playing (or resumes)
 		    currentAudio.onplay = () => {
 		        animateCharacter(track.duration);
 		        document.querySelectorAll('.track').forEach(t => t.classList.remove('playing'));
 		        element.classList.add('playing');
+        
+		        // Add the glow effects
+		        progressFill.classList.add('glowing-bar');
+		        gameCharacter.classList.add('glowing-character');
 		    };
 
+		    // When the audio is paused
+		    currentAudio.onpause = () => {
+		        element.classList.remove('playing');
+
+		        // Remove the glow effects
+		        progressFill.classList.remove('glowing-bar');
+		        gameCharacter.classList.remove('glowing-character');
+		    };
+
+		    // When the audio finishes
 		    currentAudio.onended = () => {
 		        element.classList.remove('playing');
 		        currentPlayingTrack = null;
 		        cleanupCharacterAnimation();
+		        // Ensure glow is removed on end
+		        progressFill.classList.remove('glowing-bar');
+		        gameCharacter.classList.remove('glowing-character');
 		    };
+		    // --- END OF UPDATED LOGIC ---
 
 		    currentAudio.play();
 		}
