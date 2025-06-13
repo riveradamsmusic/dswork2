@@ -72,11 +72,24 @@
       height: 80px;
       line-height: 1;
       text-align: center;
-      transition: transform 0.2s ease;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       animation: pulse-glow 2.5s infinite ease-in-out;
     }
     #emoji:active {
-      transform: scale(0.8);
+      transform: scale(0.75) rotate(-5deg);
+      transition-duration: 0.1s;
+    }
+    @keyframes cassette-vanish {
+      from {
+        opacity: 1;
+      }
+      to {
+        transform: scale(0) rotate(-15deg);
+        opacity: 0;
+      }
+    }
+    #emoji.fade-out {
+      animation: cassette-vanish 0.3s ease-in forwards;
     }
     /* Glitch Text */
     #text {
@@ -884,7 +897,7 @@
       
       function handleFirstInteraction() {
         const flickInstruction = document.getElementById('flickInstruction');
-        flickInstruction.style.display = 'none';
+        // flickInstruction.style.display = 'none'; // This line is commented out to keep the instruction visible.
         floatingImage.removeEventListener('mousedown', handleFirstInteraction);
         floatingImage.removeEventListener('touchstart', handleFirstInteraction);
       }
@@ -956,7 +969,7 @@
       setTimeout(() => {
         emojiWrapper.style.display = 'none';
         showGlitchText();
-      }, 500);
+      }, 300);
     });
   </script>
   <div id="afeegoVideoContainer">
