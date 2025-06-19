@@ -392,6 +392,170 @@
       box-shadow: 0 5px 10px rgba(0,0,0,0.2);
       cursor: grabbing;
     }
+	
+	.about-button {
+	  position: fixed;
+	  bottom: 64px;
+	  left: 30px;
+	  display: none;
+	  background: rgba(30,30,30,0.7);
+	  color: rgba(255,255,255,0.7);
+	  padding: 8px 16px;
+	  border-radius: 20px;
+	  cursor: pointer;
+	  font-family: 'Caveat', cursive;
+	  font-size: 18px;
+	  transition: all 0.3s ease;
+	  z-index: 5;
+	}
+	.about-button:hover {
+	  background: rgba(50,50,50,0.8);
+	  color: rgba(255,255,255,0.9);
+	  transform: scale(1.1);
+	}
+	.back-button {
+	  position: fixed;
+	  top: 15px;
+	  left: 30px;
+	  background: rgba(30,30,30,0.7);
+	  color: rgba(255,255,255,0.7);
+	  padding: 8px 16px;
+	  border-radius: 20px;
+	  cursor: pointer;
+	  font-family: 'Caveat', cursive;
+	  font-size: 18px;
+	  transition: all 0.3s ease;
+	  z-index: 5;
+	  display: none;
+	}
+	.back-button:hover {
+	  background: rgba(50,50,50,0.8);
+	  color: rgba(255,255,255,0.9);
+	  transform: scale(1.1);
+	}
+	
+	.notebook-page {
+	  position: fixed;
+	  top: 50%;
+	  left: 50%;
+	  transform: translate(-50%, -50%);
+	  width: 85vw;
+	  max-width: 600px;
+	  height: 80vh;
+	  max-height: 600px;
+	  min-width: 300px;
+	  min-height: 400px;
+	  background: linear-gradient(135deg, #f9f7f4 0%, #f1ede6 100%);
+	  border: 1px solid #d4c5b0;
+	  box-shadow: 
+	    0 8px 32px rgba(0,0,0,0.3),
+	    inset 0 1px 0 rgba(255,255,255,0.8);
+	  border-radius: 8px;
+	  display: none;
+	  z-index: 50;
+	  overflow: hidden;
+	}
+
+	.notebook-content {
+	  position: relative;
+	  width: 100%;
+	  height: 100%;
+	  padding: 8% 10%;
+	  box-sizing: border-box;
+	  overflow-y: auto;
+	}
+
+	.handwritten-text {
+	  position: relative;
+	  z-index: 2;
+	  font-family: 'Caveat', cursive;
+	  font-size: calc(12px + 0.5vw);
+	  line-height: 1.5;
+	  color: #2c3e50;
+	  transform: rotate(-0.5deg);
+	  height: auto;
+	}
+
+	.handwritten-text p {
+	  margin: 0 0 calc(8px + 0.8vh) 0;
+	  transform: rotate(0.2deg);
+	  text-indent: 15px;
+	}
+
+	.signature {
+	  text-align: right;
+	  font-size: calc(16px + 1vw) !important;
+	  margin-top: calc(10px + 1vh) !important;
+	  margin-right: calc(15px + 2vw);
+	  color: #34495e !important;
+	  text-indent: 0 !important;
+	}
+
+
+	@media screen and (max-width: 768px) {
+	  .notebook-page {
+	    width: 85vw;
+	    height: 33vh;
+	    min-height: 250px;
+	    max-height: calc(100vh - 150px);
+	    transform: translate(-50%, calc(-50% + 20px));
+	  }
+	  .notebook-content {
+	    padding: 6% 8%;
+	  }
+	  .handwritten-text {
+	    font-size: 13px;
+	    line-height: 1.4;
+	  }
+	  .handwritten-text p {
+	    margin: 0 0 10px 0;
+	    text-indent: 12px;
+	  }
+	  .signature {
+	    font-size: 18px !important;
+	    margin-right: 20px;
+	    margin-top: 15px !important;
+	  }
+	}
+
+	@media screen and (max-width: 480px) {
+	  .notebook-page {
+	    width: 98vw;
+	    height: 70vh;
+	    min-height: 320px;
+	  }
+	  .notebook-content {
+	    padding: 5% 6%;
+	  }
+	  .handwritten-text {
+	    font-size: 12px;
+	    line-height: 1.35;
+	  }
+	  .handwritten-text p {
+	    margin: 0 0 8px 0;
+	    text-indent: 10px;
+	  }
+	  .signature {
+	    font-size: 16px !important;
+	    margin-right: 15px;
+	    margin-top: 10px !important;
+	  }
+	}
+
+	@media screen and (min-width: 1200px) {
+	  .handwritten-text {
+	    font-size: 16px;
+	    line-height: 1.6;
+	  }
+	  .handwritten-text p {
+	    margin: 0 0 18px 0;
+	  }
+	  .signature {
+	    font-size: 24px !important;
+	    margin-top: 25px !important;
+	  }
+	}
+	
     /* Smoke Trail Effect */
     .smoke-trail {
       position: absolute;
@@ -526,6 +690,23 @@
         <span class="platform-emoji instagram">📸</span>
       </a>
     </div>
+	<div class="about-button" id="aboutButton">
+	  <span>about!</span>
+	</div>
+	<div class="back-button" id="backButton">
+	  <span>back</span>
+	</div>
+	<div class="notebook-page" id="notebookPage">
+	  <div class="notebook-content">
+	    <div class="notebook-lines"></div>
+	    <div class="handwritten-text">
+	      <p>Growing up in Western Michigan's shifting seasons, River Adams found his musical path through his sister's piano lessons, middle school saxophone, and eventually an old guitar in his grandparents basement. Those early years with music as his constant companion established a creative rhythm that would become as essential as breathing.</p>
+	      <p>His sound draws from those sun filled Lake Michigan summers—echoes of Jack Johnson's coastal grooves, John Mayer's melodic sensibility, and MGMT's experimental edge. After briefly studying computer science at Michigan State, Adams realized his calling lay elsewhere and made the move to Los Angeles in 2017, diving headfirst into California's music scene.</p>
+	      <p>Living in a creative house, he connected with collaborators like AFEEGO and Maedrix while teaching himself the art of production and recording. When Covid lockdown hit, Adams embarked on a transformative road trip from LA to Seattle, finding new creative fuel in the changing landscapes and unfamiliar cities along the way. Four solo EPs and two albums later—all self-recorded, mixed, and mastered—Adams has carved out his own sonic territory. Now he's pushing further into uncharted waters, experimenting with AI and new digital mediums to expand what music can be.</p>
+	      <p>You'll find him somewhere between the outdoors and his computer, either laying down tracks or exploring whatever digital canvas holds his next creative breakthrough. His music still carries the warmth of those formative Michigan summers, filtered through years of evolution and an instinct for what's coming next.</p>
+	    </div>
+	  </div>
+	</div>
   </div>
   <script>
     // DOM Elements
@@ -666,6 +847,7 @@
             initFloatingImage();
             const flickInstruction = document.getElementById('flickInstruction');
             flickInstruction.style.display = 'flex';
+			document.getElementById('aboutButton').style.display = 'block';
           }, 300);
         }
       }, flashInterval);
@@ -972,6 +1154,44 @@
         showGlitchText();
       }, 300);
     });
+	// About page functionality
+	document.getElementById('aboutButton').addEventListener('click', () => {
+	  // Hide main content
+	  carousel.style.display = 'none';
+	  slideshow.style.display = 'none';
+	  topRightImages.style.display = 'none';
+	  platformLinks.style.display = 'none';
+	  floatingImage.style.display = 'none';
+	  document.getElementById('aboutButton').style.display = 'none';
+	  document.getElementById('flickInstruction').style.display = 'none';
+  
+	  // Show back button
+	  document.getElementById('backButton').style.display = 'block';
+	  document.getElementById('notebookPage').style.display = 'block';
+  
+	  // Stop any playing audio
+	  if (currentAudio) {
+	    currentAudio.pause();
+	    currentPlayingTrack = null;
+	    cleanupCharacterAnimation();
+	  }
+	});
+
+	document.getElementById('backButton').addEventListener('click', () => {
+	  // Show main content
+	  carousel.style.display = 'block';
+	  slideshow.style.display = 'block';
+	  topRightImages.style.display = 'flex';
+	  platformLinks.style.display = 'flex';
+	  floatingImage.style.display = 'block';
+	  document.getElementById('aboutButton').style.display = 'block';
+	  document.getElementById('flickInstruction').style.display = 'flex';
+  
+	  // Hide back button
+	  document.getElementById('backButton').style.display = 'none';
+	  document.getElementById('notebookPage').style.display = 'none';
+	  
+	});
   </script>
   <div id="afeegoVideoContainer">
     <video id="afeegoVideo" width="320" height="180" controls>
