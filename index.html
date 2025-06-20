@@ -3,11 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>RiverAdam$</title>
+  <title>River Adams - Musical Artist | Original Songs & Albums</title>
+  <meta name="description" content="River Adams is a musical artist from Muskegon, Michigan, now based in Los Angeles. Listen to original songs including '21 Century', 'Grey', 'Mr. Solo', and collaborations with AFEEGO. Stream on Spotify, Apple Music, and YouTube.">
+  <meta name="keywords" content="River Adams, musician, artist, indie music, Los Angeles music, Michigan artist, original songs, 21 Century, Grey, Mr Solo, AFEEGO collaboration, singer songwriter">
+  <meta name="author" content="River Adams">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://riveradamsmusic.com/">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://riveradamsmusic.com/">
+  <meta property="og:title" content="River Adams - Musical Artist | Original Songs & Albums">
+  <meta property="og:description" content="River Adams is a musical artist from Muskegon, Michigan, now based in Los Angeles. Listen to original songs and stream on all platforms.">
+  <meta property="og:image" content="https://riveradamsmusic.com/RIVERADAMSME/1.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="River Adams - Musical Artist">
+  <meta property="og:site_name" content="River Adams Music">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://riveradamsmusic.com/">
+  <meta property="twitter:title" content="River Adams - Musical Artist | Original Songs & Albums">
+  <meta property="twitter:description" content="River Adams is a musical artist from Muskegon, Michigan, now based in Los Angeles. Listen to original songs and stream on all platforms.">
+  <meta property="twitter:image" content="https://riveradamsmusic.com/RIVERADAMSME/1.jpg">
+  <meta property="twitter:image:alt" content="River Adams - Musical Artist">
+  
+  <!-- Additional SEO Meta Tags -->
+  <meta name="geo.region" content="US-CA">
+  <meta name="geo.placename" content="Los Angeles">
+  <meta name="geo.position" content="34.0522;-118.2437">
+  <meta name="ICBM" content="34.0522, -118.2437">
+  
+  <!-- Schema.org structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MusicGroup",
+    "name": "River Adams",
+    "alternateName": "RiverAdam$",
+    "url": "https://riveradamsmusic.com",
+    "image": "https://riveradamsmusic.com/RIVERADAMSME/1.jpg",
+    "description": "Musical artist from Muskegon, Michigan, now based in Los Angeles, California. Known for original songs and collaborations.",
+    "genre": ["Indie", "Alternative", "Singer-Songwriter"],
+    "foundingDate": "2017",
+    "foundingLocation": {
+      "@type": "Place",
+      "name": "Los Angeles, California"
+    },
+    "member": {
+      "@type": "Person",
+      "name": "River Adams",
+      "birthDate": "1994-02-04",
+      "birthPlace": {
+        "@type": "Place",
+        "name": "Muskegon, Michigan"
+      },
+      "homeLocation": {
+        "@type": "Place",
+        "name": "Los Angeles, California"
+      }
+    },
+    "album": [
+      {
+        "@type": "MusicAlbum",
+        "name": "River Adams Collection",
+        "track": [
+          {"@type": "MusicRecording", "name": "21 Century"},
+          {"@type": "MusicRecording", "name": "Grey"},
+          {"@type": "MusicRecording", "name": "Mr. Solo"},
+          {"@type": "MusicRecording", "name": "Opportunities"},
+          {"@type": "MusicRecording", "name": "Rap (feat. AFEEGO)"},
+          {"@type": "MusicRecording", "name": "Spoken Word"},
+          {"@type": "MusicRecording", "name": "Trying"},
+          {"@type": "MusicRecording", "name": "Wynwood"}
+        ]
+      }
+    ],
+    "sameAs": [
+      "https://music.apple.com/us/artist/river-adams/1554125278",
+      "https://www.youtube.com/@RiverAdamsMusic",
+      "https://open.spotify.com/artist/5ZV6CFDURLSarqDL7Wwn6n",
+      "https://www.instagram.com/riveradamsmusic/"
+    ]
+  }
+  </script>
+  
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#000000">
   <link rel="apple-touch-startup-image" href="GITBACK/wall.png">
+  <link rel="icon" type="image/x-icon" href="RIVERADAMSME/1.jpg">
+  <link rel="apple-touch-icon" href="RIVERADAMSME/1.jpg">
   <style>
     /* Google Font Imports */
     @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
@@ -285,7 +372,7 @@
     /* Platform Links */
     .platform-links {
       position: fixed;
-      bottom: 30px;
+      bottom: 15px;
       left: 0;
       right: 0;
       display: none;
@@ -631,7 +718,7 @@
         top: 30px;
       }
       .platform-links {
-        bottom: 25px;
+        bottom: 15px;
         gap: 12px;
       }
       .platform-emoji {
@@ -758,7 +845,7 @@
       { name: "Trying", file: "RIVERADAMS/Trying_copy.mp3", duration: 200 },
       { name: "𝓦𝔂𝓷𝔀𝓸𝓸𝓭", file: "RIVERADAMS/Wynwood_copy_Wav.mp3", duration: 190 }
     ];
-    const photoFiles = Array.from({length: 11}, (_, i) => `RIVERADAMSPICZ/${i+1}.jpg`);
+    const photoFiles = Array.from({length: 9}, (_, i) => `RIVERADAMSPICZ/${i+1}.jpg`);
     totalImages = photoFiles.length;
     const fontClasses = [ 'font-caveat', 'font-press-start', 'font-rubik', 'font-comic', 'font-marker', 'font-vt323', 'font-major-mono' ];
     // Initialize Slideshow
@@ -1027,121 +1114,134 @@
       }, 1500);
     }
     // Floating Image Functions
-    function initFloatingImage() {
-      floatingImage.style.display = 'block';
-      
-      // --- MODIFICATION START ---
-      // Define the starting position and boomerang physics constants
-      const startX = window.innerWidth * 0.1;
-      const startY = window.innerHeight * 0.2;
-      const returnSpring = 0.04; // The "pull" strength of the boomerang
-      const throwFriction = 0.97; // How quickly the initial throw and return motion dampens
+	function initFloatingImage() {
+	  floatingImage.style.display = 'block';
+  
+	  // --- MODIFICATION START ---
+	  // Define boomerang physics constants
+	  const returnSpring = 0.04; // The "pull" strength of the boomerang
+	  const throwFriction = 0.97; // How quickly the initial throw and return motion dampens
 
-      // Set initial position
-      currentX = startX;
-      currentY = startY;
-      floatingImage.style.left = `${currentX}px`;
-      floatingImage.style.top = `${currentY}px`;
-      
-      function updateFloatingImage() {
-        if (!isDraggingFloatingImage) {
-          // Calculate the distance to the start position (the "pull" of the spring)
-          const dx = startX - currentX;
-          const dy = startY - currentY;
-          
-          // Apply the spring force to the velocity, pulling it back
-          velocityX += dx * returnSpring;
-          velocityY += dy * returnSpring;
-          
-          // Apply friction to dampen the movement for a smooth, snappy stop
-          velocityX *= throwFriction;
-          velocityY *= throwFriction;
-          
-          // Update the position with the new velocity
-          currentX += velocityX;
-          currentY += velocityY;
-          
-          floatingImage.style.left = `${currentX}px`;
-          floatingImage.style.top = `${currentY}px`;
+	  // Function to calculate the anchor position based on current window size
+	  function getAnchorPosition() {
+	    return {
+	      x: window.innerWidth * 0.1,
+	      y: window.innerHeight * 0.2
+	    };
+	  }
 
-          // Create smoke trail when moving
-          if (Math.abs(velocityX) > 1 || Math.abs(velocityY) > 1) {
-            createSmokeTrail(
-              currentX + floatingImage.offsetWidth / 2,
-              currentY + floatingImage.offsetHeight / 2
-            );
-          }
-        }
-        animationFrameId = requestAnimationFrame(updateFloatingImage);
-      }
-      // --- MODIFICATION END ---
+	  // Set initial position
+	  let anchor = getAnchorPosition();
+	  currentX = anchor.x;
+	  currentY = anchor.y;
+	  floatingImage.style.left = `${currentX}px`;
+	  floatingImage.style.top = `${currentY}px`;
+  
+	  // Add window resize listener to update anchor position
+	  function handleResize() {
+	    anchor = getAnchorPosition();
+	  }
+	  window.addEventListener('resize', handleResize);
+  
+	  function updateFloatingImage() {
+	    if (!isDraggingFloatingImage) {
+	      // Calculate the distance to the current anchor position
+	      const dx = anchor.x - currentX;
+	      const dy = anchor.y - currentY;
+      
+	      // Apply the spring force to the velocity, pulling it back
+	      velocityX += dx * returnSpring;
+	      velocityY += dy * returnSpring;
+      
+	      // Apply friction to dampen the movement for a smooth, snappy stop
+	      velocityX *= throwFriction;
+	      velocityY *= throwFriction;
+      
+	      // Update the position with the new velocity
+	      currentX += velocityX;
+	      currentY += velocityY;
+      
+	      floatingImage.style.left = `${currentX}px`;
+	      floatingImage.style.top = `${currentY}px`;
 
-      let throwVector = { x: 0, y: 0 };
-      
-      function handleFirstInteraction() {
-        const flickInstruction = document.getElementById('flickInstruction');
-        // flickInstruction.style.display = 'none'; // This line is commented out to keep the instruction visible.
-        floatingImage.removeEventListener('mousedown', handleFirstInteraction);
-        floatingImage.removeEventListener('touchstart', handleFirstInteraction);
-      }
+	      // Create smoke trail when moving
+	      if (Math.abs(velocityX) > 1 || Math.abs(velocityY) > 1) {
+	        createSmokeTrail(
+	          currentX + floatingImage.offsetWidth / 2,
+	          currentY + floatingImage.offsetHeight / 2
+	        );
+	      }
+	    }
+	    animationFrameId = requestAnimationFrame(updateFloatingImage);
+	  }
+	  // --- MODIFICATION END ---
 
-      floatingImage.addEventListener('mousedown', handleFirstInteraction);
-      floatingImage.addEventListener('touchstart', handleFirstInteraction, { passive: false });
-      
-      floatingImage.addEventListener('mousedown', handleDragStart);
-      floatingImage.addEventListener('touchstart', handleDragStart, { passive: false });
-      
-      document.addEventListener('mousemove', handleDragMove);
-      document.addEventListener('touchmove', handleDragMove, { passive: false });
-      
-      document.addEventListener('mouseup', handleDragEnd);
-      document.addEventListener('touchend', handleDragEnd);
-      
-      function handleDragStart(e) {
-        if (isDraggingFloatingImage) return;
-        isDraggingFloatingImage = true;
-        floatingImage.classList.add('grabbing');
-        throwVector = { x: 0, y: 0 };
-        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-        if (clientX && clientY) {
-          lastX = clientX;
-          lastY = clientY;
-        }
-        if (e.cancelable) e.preventDefault();
-      }
-      
-      function handleDragMove(e) {
-        if (!isDraggingFloatingImage) return;
-        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-        if (!clientX || !clientY) return;
-        throwVector.x = clientX - lastX;
-        throwVector.y = clientY - lastY;
-        currentX += throwVector.x;
-        currentY += throwVector.y;
-        floatingImage.style.left = `${currentX}px`;
-        floatingImage.style.top = `${currentY}px`;
-        lastX = clientX;
-        lastY = clientY;
-        if (e.cancelable) e.preventDefault();
-      }
-      
-      function handleDragEnd() {
-        if (!isDraggingFloatingImage) return;
-        isDraggingFloatingImage = false;
-        floatingImage.classList.remove('grabbing');
-        
-        // The "throwPower" is now integrated into the velocity from the flick
-        const throwPower = 1.5;
-        if (Math.abs(throwVector.x) > 1 || Math.abs(throwVector.y) > 1) {
-          velocityX = throwVector.x * throwPower;
-          velocityY = throwVector.y * throwPower;
-        }
-      }
-      
-      updateFloatingImage();
-    }
+	  let throwVector = { x: 0, y: 0 };
+  
+	  function handleFirstInteraction() {
+	    const flickInstruction = document.getElementById('flickInstruction');
+	    // flickInstruction.style.display = 'none'; // This line is commented out to keep the instruction visible.
+	    floatingImage.removeEventListener('mousedown', handleFirstInteraction);
+	    floatingImage.removeEventListener('touchstart', handleFirstInteraction);
+	  }
+
+	  floatingImage.addEventListener('mousedown', handleFirstInteraction);
+	  floatingImage.addEventListener('touchstart', handleFirstInteraction, { passive: false });
+  
+	  floatingImage.addEventListener('mousedown', handleDragStart);
+	  floatingImage.addEventListener('touchstart', handleDragStart, { passive: false });
+  
+	  document.addEventListener('mousemove', handleDragMove);
+	  document.addEventListener('touchmove', handleDragMove, { passive: false });
+  
+	  document.addEventListener('mouseup', handleDragEnd);
+	  document.addEventListener('touchend', handleDragEnd);
+  
+	  function handleDragStart(e) {
+	    if (isDraggingFloatingImage) return;
+	    isDraggingFloatingImage = true;
+	    floatingImage.classList.add('grabbing');
+	    throwVector = { x: 0, y: 0 };
+	    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+	    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+	    if (clientX && clientY) {
+	      lastX = clientX;
+	      lastY = clientY;
+	    }
+	    if (e.cancelable) e.preventDefault();
+	  }
+  
+	  function handleDragMove(e) {
+	    if (!isDraggingFloatingImage) return;
+	    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+	    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+	    if (!clientX || !clientY) return;
+	    throwVector.x = clientX - lastX;
+	    throwVector.y = clientY - lastY;
+	    currentX += throwVector.x;
+	    currentY += throwVector.y;
+	    floatingImage.style.left = `${currentX}px`;
+	    floatingImage.style.top = `${currentY}px`;
+	    lastX = clientX;
+	    lastY = clientY;
+	    if (e.cancelable) e.preventDefault();
+	  }
+  
+	  function handleDragEnd() {
+	    if (!isDraggingFloatingImage) return;
+	    isDraggingFloatingImage = false;
+	    floatingImage.classList.remove('grabbing');
+    
+	    // The "throwPower" is now integrated into the velocity from the flick
+	    const throwPower = 1.5;
+	    if (Math.abs(throwVector.x) > 1 || Math.abs(throwVector.y) > 1) {
+	      velocityX = throwVector.x * throwPower;
+	      velocityY = throwVector.y * throwPower;
+	    }
+	  }
+  
+	  updateFloatingImage();
+	}
     // Event Listeners
     emojiWrapper.addEventListener('click', async () => {
       if (!audioContext) {
@@ -1169,12 +1269,7 @@
 	  document.getElementById('backButton').style.display = 'block';
 	  document.getElementById('notebookPage').style.display = 'block';
   
-	  // Stop any playing audio
-	  if (currentAudio) {
-	    currentAudio.pause();
-	    currentPlayingTrack = null;
-	    cleanupCharacterAnimation();
-	  }
+	  
 	});
 
 	document.getElementById('backButton').addEventListener('click', () => {
